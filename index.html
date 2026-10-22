@@ -1,0 +1,1125 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Tchê Parrilla</title>
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#120F0D">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Tchê Parrilla">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: app de celular escuro (brasa noturna), 5 abas fixas embaixo; a foto real da churrasqueira é o mapa; números em mono como etiqueta de açougue */
+:root{
+  --carvao:#120F0D; --tiz:#1C1714; --tiz2:#261F1A; --linha:#3A302A;
+  --osso:#F2E8DD; --fumaca:#A89A8E; --brasa:#FF7A2F; --brasa2:#E2541B; --cobre:#C98B5B; --couro:#7A4E33;
+  --ok:#8BC48A; --alerta:#F2B544; --perigo:#FF6B5A;
+  --f-marca:'Alfa Slab One','Rockwell','Roboto Slab',Georgia,serif;
+  --f-corpo:'Archivo',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --f-dado:'IBM Plex Mono',ui-monospace,Menlo,monospace;
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+html,body{background:var(--carvao);color:var(--osso);margin:0}
+img{max-width:100%}
+[hidden]{display:none!important}
+body{font-family:var(--f-corpo);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-block:env(safe-area-inset-top,0px) calc(84px + env(safe-area-inset-bottom,0px))}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--carvao)}
+.app{max-width:640px;margin:0 auto}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--brasa);outline-offset:2px}
+.mono{font-family:var(--f-dado);font-variant-numeric:tabular-nums}
+
+/* cabeçalho */
+.top{display:flex;align-items:center;gap:12px;padding-block:18px 14px;position:relative}
+.top::after{content:"";position:absolute;left:-40px;right:-40px;top:-60px;height:180px;pointer-events:none;z-index:-1;
+  background:radial-gradient(60% 70% at 18% 30%,rgba(255,122,47,.16),transparent 70%)}
+.emblema{width:46px;height:46px;flex:none;color:var(--cobre)}
+.marca{font-family:var(--f-marca);font-size:22px;letter-spacing:.06em;line-height:1;margin:0}
+.marca b{color:var(--brasa);font-weight:400}
+.sub{font-size:12px;color:var(--fumaca);letter-spacing:.08em;text-transform:uppercase;margin-top:5px}
+.top .data{margin-left:auto}
+.top input[type=date]{background:var(--tiz);border:1px solid var(--linha);border-radius:10px;padding:7px 9px;font-family:var(--f-dado);font-size:13px;max-width:150px}
+
+h2.sec{font-family:var(--f-marca);font-weight:400;font-size:19px;letter-spacing:.03em;margin:26px 0 10px;text-wrap:balance}
+h3.cat{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--cobre);margin:22px 0 8px;display:flex;justify-content:space-between;align-items:baseline;font-weight:600}
+h3.cat span{color:var(--fumaca);letter-spacing:.04em;font-family:var(--f-dado);font-weight:400}
+.muted{color:var(--fumaca)}
+.small{font-size:13px}
+
+/* quem vem */
+.gente{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.passo{background:var(--tiz);border:1px solid var(--linha);border-radius:14px;padding:10px 8px;text-align:center}
+.passo .rot{font-size:12px;color:var(--fumaca)}
+.passo .rot small{display:block;font-family:var(--f-dado);font-size:10.5px;opacity:.8}
+.passo .ctl{display:flex;align-items:center;justify-content:space-between;margin-top:6px}
+.passo .ctl button{width:34px;height:34px;border-radius:50%;border:1px solid var(--linha);background:var(--tiz2);font-size:19px;line-height:1}
+.passo .ctl output{font-family:var(--f-dado);font-size:22px;font-weight:500}
+.linha2{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+.campo{flex:1 1 140px;display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--tiz);border:1px solid var(--linha);border-radius:12px;padding:8px 12px}
+.campo label{font-size:13px;color:var(--fumaca)}
+.campo input[type=time]{background:transparent;border:0;font-family:var(--f-dado);font-size:16px}
+.sw{position:relative;width:42px;height:24px;flex:none}
+.sw input{opacity:0;position:absolute;inset:0;margin:0;cursor:pointer}
+.sw i{position:absolute;inset:0;border-radius:12px;background:var(--linha);transition:background .2s}
+.sw i::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:var(--osso);transition:transform .2s}
+.sw input:checked+i{background:var(--brasa2)}
+.sw input:checked+i::after{transform:translateX(18px)}
+
+/* presets */
+.presets{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;margin-inline:-2px}
+.presets::-webkit-scrollbar{display:none}
+.chip{flex:none;border:1px solid var(--linha);background:var(--tiz);border-radius:999px;padding:7px 13px;font-size:13px;white-space:nowrap}
+.chip.on{border-color:var(--brasa);color:var(--brasa)}
+
+/* leitura do assador */
+.leitura{margin-top:18px;border:1px solid var(--couro);border-radius:16px;background:linear-gradient(160deg,var(--tiz2),var(--tiz));overflow:hidden}
+.leitura .nums{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-bottom:1px solid var(--linha)}
+.leitura .num{padding:12px 8px;text-align:center;border-right:1px solid var(--linha)}
+.leitura .num:last-child{border-right:0}
+.leitura .num b{display:block;font-family:var(--f-dado);font-weight:500;font-size:18px;color:var(--osso)}
+.leitura .num span{font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--fumaca)}
+.leitura ul{list-style:none;margin:0;padding:10px 14px 12px;display:grid;gap:7px}
+.leitura li{font-size:13.5px;padding-left:16px;position:relative}
+.leitura li::before{content:"";position:absolute;left:0;top:7px;width:7px;height:7px;border-radius:2px;background:var(--cobre)}
+.leitura li.alerta::before{background:var(--alerta)}
+.leitura li.perigo::before{background:var(--perigo)}
+.leitura li.ok::before{background:var(--ok)}
+
+/* cardápio */
+.itens{display:grid;gap:6px}
+.item{background:var(--tiz);border:1px solid var(--linha);border-radius:12px;transition:border-color .15s,background .15s}
+.item.on{border-color:var(--brasa2);background:linear-gradient(90deg,rgba(226,84,27,.14),var(--tiz) 60%)}
+.item .row{display:flex;align-items:center;gap:10px;padding:10px 10px 10px 12px}
+.item .tog{flex:1;min-width:0;display:flex;align-items:center;gap:11px;background:none;border:0;padding:0;text-align:left}
+.box{width:20px;height:20px;border-radius:6px;border:1.5px solid var(--fumaca);flex:none;display:grid;place-items:center}
+.item.on .box{background:var(--brasa);border-color:var(--brasa)}
+.item.on .box::after{content:"";width:9px;height:5px;border:2px solid var(--carvao);border-top:0;border-right:0;transform:rotate(-45deg) translate(1px,-1px)}
+.nome{font-weight:600;font-size:14.5px}
+.meta{font-size:12px;color:var(--fumaca);font-family:var(--f-dado);margin-top:1px}
+.assin{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--brasa);border:1px solid var(--brasa2);border-radius:4px;padding:1px 5px;margin-left:6px;vertical-align:2px;font-family:var(--f-corpo)}
+.dicab{flex:none;background:none;border:1px solid var(--linha);border-radius:8px;font-size:12px;padding:5px 9px;color:var(--fumaca)}
+.dicab[aria-expanded=true]{color:var(--brasa);border-color:var(--brasa2)}
+.dica{padding:0 14px 13px 43px;font-size:13.5px;color:var(--osso)}
+.dica p{margin:0 0 6px;max-width:62ch}
+.dica .ped{color:var(--cobre);font-size:12.5px}
+
+/* compras */
+.totais{display:flex;gap:10px;flex-wrap:wrap;align-items:stretch}
+.tot{flex:1 1 130px;background:var(--tiz);border:1px solid var(--linha);border-radius:14px;padding:12px 14px}
+.tot b{display:block;font-family:var(--f-dado);font-size:24px;font-weight:500}
+.tot.dest b{color:var(--brasa)}
+.tot span{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--fumaca)}
+.acoes{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.btn{border:1px solid var(--linha);background:var(--tiz2);border-radius:12px;padding:10px 14px;font-weight:600;font-size:14px;text-decoration:none;display:inline-flex;align-items:center;gap:8px}
+.btn.pri{background:var(--brasa2);border-color:var(--brasa2);color:#fff}
+.btn.peq{padding:6px 10px;font-size:12.5px;border-radius:9px}
+.secao{margin-top:18px}
+.lc{display:flex;align-items:flex-start;gap:11px;padding:11px 2px;border-bottom:1px dashed var(--linha)}
+.lc:last-child{border-bottom:0}
+.lc .box{margin-top:2px;background:none;padding:0}
+.lc.feito .box{background:var(--ok);border-color:var(--ok)}
+.lc.feito .box::after{content:"";width:9px;height:5px;border:2px solid var(--carvao);border-top:0;border-right:0;transform:rotate(-45deg) translate(1px,-1px)}
+.lc.feito .lcn{text-decoration:line-through;color:var(--fumaca)}
+.lc .lcb{flex:1;min-width:0}
+.lcn{font-weight:600;font-size:14.5px}
+.lcq{font-family:var(--f-dado);font-size:13px;color:var(--brasa)}
+.lcp{font-size:12.5px;color:var(--fumaca);margin-top:2px}
+.preco{flex:none;text-align:right;font-family:var(--f-dado);font-size:13px}
+.preco button{background:none;border:0;border-bottom:1px dotted var(--fumaca);padding:0;font-size:11.5px;color:var(--fumaca);font-family:var(--f-dado)}
+.preco input{width:76px;background:var(--tiz2);border:1px solid var(--brasa2);border-radius:6px;padding:3px 5px;font-family:var(--f-dado);font-size:12.5px;text-align:right}
+.nota{font-size:12.5px;color:var(--fumaca);margin-top:12px;max-width:62ch}
+
+/* fogo */
+.mapa{position:relative;border-radius:16px;overflow:hidden;border:1px solid var(--linha);background:var(--tiz)}
+.mapa img{display:block;width:100%;height:auto;filter:saturate(.8) brightness(.78)}
+.pin{position:absolute;transform:translate(-50%,-50%);min-width:30px;height:30px;border-radius:15px;padding:0 8px;border:2px solid var(--osso);
+  background:rgba(18,15,13,.82);font-family:var(--f-dado);font-size:13px;font-weight:500;display:grid;place-items:center}
+.pin.ativo{background:var(--brasa2);border-color:#FFD2B8;box-shadow:0 0 0 0 rgba(255,122,47,.6);animation:brasa 2.4s ease-out infinite}
+.pin.sel{outline:3px solid var(--osso);outline-offset:2px}
+@keyframes brasa{0%{box-shadow:0 0 0 0 rgba(255,122,47,.55)}70%{box-shadow:0 0 0 12px rgba(255,122,47,0)}100%{box-shadow:0 0 0 0 rgba(255,122,47,0)}}
+@media (prefers-reduced-motion:reduce){.pin.ativo{animation:none}}
+.pinfo{margin-top:10px;background:var(--tiz);border:1px solid var(--linha);border-radius:14px;padding:12px 14px}
+.pinfo h4{margin:0 0 4px;font-size:15px}
+.pinfo ul{margin:8px 0 0;padding-left:18px;font-size:13.5px}
+.legenda{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.legenda button{font-size:12px;border:1px solid var(--linha);background:var(--tiz);border-radius:999px;padding:5px 10px}
+.legenda button.sel{border-color:var(--brasa);color:var(--brasa)}
+.modo{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--tiz2);border:1px solid var(--couro);border-radius:14px;padding:12px 14px;margin-top:6px}
+.modo p{margin:0;font-size:12.5px;color:var(--fumaca)}
+.crono{list-style:none;margin:10px 0 0;padding:0;position:relative}
+.crono::before{content:"";position:absolute;left:58px;top:6px;bottom:6px;width:2px;background:var(--linha)}
+.ev{display:grid;grid-template-columns:50px 18px minmax(0,1fr);gap:0 8px;padding:7px 0;align-items:start}
+.ev time{font-family:var(--f-dado);font-size:13.5px;text-align:right;padding-top:1px}
+.ev .dot{width:12px;height:12px;border-radius:50%;margin:4px 0 0 1px;border:2px solid var(--carvao);background:var(--fumaca);position:relative;z-index:1}
+.ev.fogo .dot{background:var(--brasa)}
+.ev.entra .dot{background:var(--cobre)}
+.ev.sai .dot{background:var(--ok)}
+.ev.prep .dot{background:var(--fumaca)}
+.ev.serve .dot{background:var(--osso);width:14px;height:14px;margin-left:0}
+.ev .tx{font-size:14px}
+.ev .tx small{display:block;color:var(--fumaca);font-size:12px}
+.ev.serve .tx{font-family:var(--f-marca);font-size:16px;letter-spacing:.03em}
+.ev.passou{opacity:.42}
+.ev.agora time{color:var(--brasa)}
+.agora-linha{display:flex;align-items:center;gap:8px;font-family:var(--f-dado);font-size:11px;color:var(--brasa);margin:2px 0 2px 34px}
+.agora-linha::after{content:"";flex:1;height:1px;background:var(--brasa)}
+
+/* arsenal */
+.ars{display:grid;gap:8px}
+.arm{background:var(--tiz);border:1px solid var(--linha);border-radius:14px;padding:12px 14px;display:flex;gap:12px;align-items:flex-start}
+.arm.hoje{border-color:var(--couro)}
+.arm .t{flex:1;min-width:0}
+.arm .t b{font-size:14.5px}
+.arm .t p{margin:3px 0 0;font-size:13px;color:var(--fumaca);max-width:62ch}
+.tag{display:inline-block;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--brasa);margin-left:6px}
+.seg{flex:none;display:flex;border:1px solid var(--linha);border-radius:9px;overflow:hidden}
+.seg button{background:none;border:0;padding:6px 9px;font-size:12px;color:var(--fumaca)}
+.seg button.on{background:var(--tiz2);color:var(--osso)}
+.seg button.on.tenho{color:var(--ok)}
+.seg button.on.quero{color:var(--alerta)}
+
+/* histórico */
+.salvar{background:var(--tiz);border:1px solid var(--couro);border-radius:16px;padding:14px;display:grid;gap:10px}
+.salvar input[type=text],.salvar textarea{width:100%;box-sizing:border-box;background:var(--tiz2);border:1px solid var(--linha);border-radius:10px;padding:9px 11px;font-size:14px}
+.salvar textarea{min-height:64px;resize:vertical}
+.estrelas{display:flex;gap:4px}
+.estrelas button{background:none;border:0;font-size:24px;line-height:1;padding:2px;color:var(--linha)}
+.estrelas button.on{color:var(--brasa)}
+.hist{display:grid;gap:8px;margin-top:6px}
+.hc{background:var(--tiz);border:1px solid var(--linha);border-radius:14px;padding:12px 14px}
+.hc .hh{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.hc .hh b{font-size:15px}
+.hc .hm{font-family:var(--f-dado);font-size:12px;color:var(--fumaca);margin-top:2px}
+.hc .hi{font-size:13px;margin-top:6px;color:var(--osso)}
+.hc .ho{font-size:13px;margin-top:6px;color:var(--cobre);font-style:italic}
+.fav{background:none;border:0;font-size:20px;line-height:1;color:var(--linha);padding:0}
+.fav.on{color:var(--alerta)}
+.vazio{border:1px dashed var(--linha);border-radius:14px;padding:18px;text-align:center;color:var(--fumaca);font-size:13.5px}
+.filtro{display:flex;gap:6px;margin-top:4px}
+
+/* convidados */
+.passo .ctl button:disabled{opacity:.35;cursor:default}
+.conv{margin-top:8px;background:var(--tiz);border:1px solid var(--linha);border-radius:14px}
+.conv-tit{width:100%;display:flex;justify-content:space-between;align-items:center;gap:10px;background:none;border:0;padding:11px 14px;text-align:left;font-size:14px}
+.conv-tit > span:last-child{font-family:var(--f-dado);font-size:18px;color:var(--fumaca)}
+.conv-corpo{display:grid;gap:8px;padding:0 12px 12px}
+.conv-add{display:flex;gap:6px}
+.conv-add input{flex:1;min-width:0}
+.conv input[type=text],.conv select,.rateio input,.fbs select{background:var(--tiz2);border:1px solid var(--linha);border-radius:9px;padding:7px 9px;font-size:14px;min-width:0}
+.rateio .campo input{background:transparent;border:0;text-align:right;width:100%;font-family:var(--f-dado);font-size:15px;padding:2px 0}
+.rateio .campo{flex:1 1 180px}
+.turma{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.turma .chip{padding:5px 11px;font-size:12.5px}
+.cv{display:grid;gap:6px;padding:9px 0;border-top:1px dashed var(--linha)}
+.cv-l1{display:flex;align-items:center;gap:8px}
+.cv-l1 b{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cv-l1 select{font-size:13px;padding:5px 7px}
+.paga{display:flex;align-items:center;gap:4px;font-size:12.5px;color:var(--fumaca)}
+.paga input{accent-color:var(--brasa2);width:16px;height:16px}
+.cv-x{background:none;border:1px solid var(--linha);border-radius:8px;width:30px;height:30px;font-size:17px;line-height:1;color:var(--fumaca)}
+.cv-obs{width:100%;box-sizing:border-box;font-size:13px!important}
+.rateio{display:grid;gap:8px}
+
+/* chef */
+.chef{display:grid;gap:10px;background:linear-gradient(160deg,var(--tiz2),var(--tiz));border:1px solid var(--couro);border-radius:16px;padding:14px}
+.sugest{display:flex;flex-wrap:wrap;gap:6px}
+.sugest .chip{white-space:normal;text-align:left;font-size:12.5px;line-height:1.3}
+.conversa{display:grid;gap:8px;max-height:52vh;overflow-y:auto}
+.msg{font-size:14px;line-height:1.5;padding:10px 12px;border-radius:12px;max-width:92%}
+.msg.eu{justify-self:end;background:var(--brasa2);color:#fff;border-bottom-right-radius:4px}
+.msg.chefm{justify-self:start;background:var(--carvao);border:1px solid var(--linha);border-bottom-left-radius:4px}
+.chef-in{display:flex;gap:8px;align-items:flex-end}
+.chef-in textarea{flex:1;min-width:0;background:var(--carvao);border:1px solid var(--linha);border-radius:12px;padding:9px 11px;font-size:14px;resize:none}
+
+/* histórico: retorno e fotos */
+.fb{display:grid;gap:5px}
+.fb .seg{flex-wrap:wrap;justify-self:start}
+.fbs{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:8px}
+.fbs select{font-size:12.5px;padding:4px 6px;margin-left:4px}
+.fotos{display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:6px;margin-top:10px}
+.foto{padding:0;border:1px solid var(--linha);border-radius:10px;overflow:hidden;background:var(--tiz2);aspect-ratio:1;max-width:100%}
+.foto img{width:100%;height:100%;object-fit:cover;display:block}
+.lightbox{position:fixed;inset:0;z-index:40;background:rgba(10,8,7,.94);display:grid;place-items:center;gap:12px;align-content:center;
+  padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.lightbox img{max-width:100%;max-height:78vh;border-radius:12px}
+
+/* entrar */
+.entrar{min-height:100vh;display:grid;place-items:center;text-align:center;padding-block:40px}
+.entrar .cx{display:grid;gap:14px;justify-items:center;width:100%;max-width:340px}
+.entrar img{width:112px;height:112px;border-radius:26px}
+.entrar h1{font-family:var(--f-marca);font-weight:400;font-size:28px;letter-spacing:.06em;margin:6px 0 0}
+.entrar h1 b{color:var(--brasa);font-weight:400}
+.entrar p{margin:0;color:var(--fumaca);font-size:14px}
+.entrar .btn{width:100%;justify-content:center}
+.entrar input{width:100%;background:var(--tiz);border:1px solid var(--linha);border-radius:12px;padding:11px 12px;font-size:16px}
+.sair{background:none;border:0;color:var(--fumaca);font-size:12px;text-decoration:underline;padding:0}
+
+/* abas */
+.tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;background:rgba(18,15,13,.94);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  border-top:1px solid var(--linha);display:grid;grid-template-columns:repeat(5,minmax(0,1fr));
+  padding:6px max(8px,env(safe-area-inset-right,0px),calc(50vw - 320px)) calc(6px + env(safe-area-inset-bottom,0px)) max(8px,env(safe-area-inset-left,0px),calc(50vw - 320px))}
+.tabs button{background:none;border:0;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 0;color:var(--fumaca);font-size:11px;letter-spacing:.03em}
+.tabs button svg{width:24px;height:24px}
+.tabs button[aria-selected=true]{color:var(--brasa)}
+.toast{position:fixed;left:50%;bottom:calc(92px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:30;background:var(--osso);color:var(--carvao);
+  font-weight:600;font-size:14px;padding:10px 16px;border-radius:12px;max-width:min(92vw,520px);box-shadow:0 10px 30px rgba(0,0,0,.4)}
+@media (min-width:700px){body{font-size:15.5px}.marca{font-size:26px}}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+</head>
+<body>
+<div class="entrar" id="entrar" hidden></div>
+<div class="app" id="app" hidden>
+  <header class="top">
+    <svg class="emblema" viewBox="0 0 64 64" aria-hidden="true">
+      <circle cx="32" cy="32" r="29" fill="none" stroke="currentColor" stroke-width="3.2"/>
+      <circle cx="32" cy="32" r="24.5" fill="none" stroke="currentColor" stroke-width="1" opacity=".55"/>
+      <path d="M32 11c3.6 5.4 9.4 8.6 9.4 16a9.4 9.4 0 0 1-18.8 0c0-4.2 2-6.6 4.2-9.2.2 3 1.4 5 3.4 6-1-5.2.4-9 1.8-12.8z" fill="#FF7A2F"/>
+      <path d="M30.6 26.5c1.6 2 3.8 3.4 3.8 6.4a3.4 3.4 0 0 1-6.8 0c0-1.8 1.2-3.2 3-6.4z" fill="#FFD2B8"/>
+      <path d="M17 43.5h30M19 48.5h26M22.5 53.5h19" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+    </svg>
+    <div>
+      <h1 class="marca">TCHÊ <b>PARRILLA</b></h1>
+      <div class="sub">Planejador do assador</div>
+    </div>
+    <div class="data"><input type="date" id="f-data" aria-label="Data do churrasco"></div>
+  </header>
+  <main id="view"></main>
+</div>
+
+<nav class="tabs" id="tabs" role="tablist" aria-label="Seções" hidden>
+  <button role="tab" data-tab="montar" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 9h16M5 13h14M7 17h10"/><path d="M12 3c1.2 1.6 2.4 2.4 2.4 4a2.4 2.4 0 0 1-4.8 0c0-1 .6-1.6 1.2-2.4"/></svg>Montar</button>
+  <button role="tab" data-tab="compras" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h2l2.2 10.5h10.6L20 8H6.2"/><circle cx="9" cy="19" r="1.4"/><circle cx="17" cy="19" r="1.4"/></svg>Compras</button>
+  <button role="tab" data-tab="fogo" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 2.5c3 4 6.5 6 6.5 11a6.5 6.5 0 0 1-13 0c0-3 1.4-4.8 3-6.6.2 2 1 3.4 2.4 4.2-.7-3.6.3-6.2 1.1-8.6z"/></svg>Fogo</button>
+  <button role="tab" data-tab="arsenal" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 20 15.5 9.5M8 21l11-11"/><path d="M15.5 9.5 18 3l1 1-.5 2.5L21 6l-2 4"/></svg>Arsenal</button>
+  <button role="tab" data-tab="historico" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5A1.5 1.5 0 0 1 5.5 4H19v15H5.5A1.5 1.5 0 0 0 4 20.5z"/><path d="M4 20.5A1.5 1.5 0 0 1 5.5 19H19"/><path d="m11.5 8 1 2 2.2.3-1.6 1.5.4 2.2-2-1-2 1 .4-2.2L8.3 10.3l2.2-.3z"/></svg>Histórico</button>
+</nav>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+/* ===================== dados ===================== */
+const CATS=[['boi','Boi'],['porco','Porco e embutidos'],['frango','Frango'],['cordeiro','Cordeiro'],['mar','Peixe e frutos do mar'],
+  ['brasa','Na brasa e legumes'],['ferro','Ferro fundido'],['sobremesa','Sobremesa'],['molho','Molhos e sal'],['bebida','Bebidas']];
+const CARNE=['boi','porco','frango','cordeiro','mar'];
+const LADO=['brasa','ferro'];
+const EST={
+  parrilla:{n:'Parrilla',pin:'parrilla'}, superior:{n:'Grelha de cima',pin:'superior'},
+  'espeto-alto':{n:'Espeto, fileira de cima',pin:'espeto-alto'}, 'espeto-baixo':{n:'Espeto, fileira de baixo',pin:'espeto-baixo'},
+  cesto:{n:'Cesto rotativo',pin:'cesto'}, frigideira:{n:'Frigideira furada na parrilla',pin:'parrilla'},
+  ferro:{n:'Panelinha de ferro na parrilla',pin:'parrilla'}, rescoldo:{n:'Rescoldo, na cinza quente',pin:'rescoldo'}, cozinha:{n:'Cozinha',pin:null}
+};
+const PINS=[
+  {id:'braseiro',n:'Braseiro',x:19,y:50,t:'A lenha queima aqui e a brasa cai para ser puxada sob a parrilla. Reponha lenha a cada 40 a 50 min.'},
+  {id:'superior',n:'Grelha de cima',x:42,y:41,t:'Calor indireto: pão, cortes prontos esperando e descanso quente.'},
+  {id:'parrilla',n:'Parrilla',x:42,y:58,t:'Altura na manivela: baixa para selar, alta para fogo lento. A frigideira furada e a panelinha de ferro vão aqui.'},
+  {id:'rescoldo',n:'Leito de brasa',x:41,y:80,t:'Brasa espalhada sob a parrilla. Batata e cebola no alumínio vão na cinza quente do canto.'},
+  {id:'espeto-alto',n:'Espetos de cima',x:80,y:60,t:'4 posições, mais longe da brasa: peças grandes e fogo lento.'},
+  {id:'cesto',n:'Cesto rotativo',x:64,y:72,t:'Ocupa uma posição da fileira de baixo. Legumes e pedaços pequenos.'},
+  {id:'espeto-baixo',n:'Espetos de baixo',x:84,y:80,t:'3 posições além do cesto, perto da brasa: linguiça, coração, picanha. Carvão opcional no fosso.'}
+];
+const CAP={'espeto-alto':4,'espeto-baixo':3,cesto:1};
+const PRONTO={entrada:-40,principal:0,acomp:0,sobremesa:40};
+const PESO={principal:1,entrada:.5};
+
+// ingrediente: [nome, unidade, seção, preço por unidade]
+const ING={
+ sal_parrillero:['Sal parrillero (entrefino ou flocos)','pct','Mercearia',12], sal_grosso:['Sal grosso 1 kg','pct','Mercearia',5],
+ azeite:['Azeite extravirgem 500 ml','un','Mercearia',45], alho:['Alho','cabeça','Hortifruti',2.5], salsinha:['Salsinha','maço','Hortifruti',4],
+ oregano:['Orégano desidratado 10 g','pct','Mercearia',5], calabresa:['Pimenta calabresa em flocos','pct','Mercearia',6],
+ vinagre_tinto:['Vinagre de vinho tinto 750 ml','un','Mercearia',12], vinagre_maca:['Vinagre de maçã 750 ml','un','Mercearia',8],
+ ketchup:['Ketchup 400 g','un','Mercearia',10], mascavo:['Açúcar mascavo 500 g','pct','Mercearia',9], mostarda:['Mostarda 200 g','un','Mercearia',6],
+ paprica:['Páprica defumada 40 g','pct','Mercearia',8], molho_ingles:['Molho inglês 150 ml','un','Mercearia',8],
+ tomate:['Tomate italiano','kg','Hortifruti',9], tomate_cereja:['Tomate cereja 250 g','bandeja','Hortifruti',7],
+ cebola:['Cebola','kg','Hortifruti',6], cebola_roxa:['Cebola roxa','kg','Hortifruti',8], pimentao:['Pimentão vermelho ou amarelo','un','Hortifruti',4],
+ abobrinha:['Abobrinha italiana','un','Hortifruti',3], berinjela:['Berinjela','un','Hortifruti',4], cogumelo:['Cogumelo paris 200 g','bandeja','Hortifruti',12],
+ batata_bolinha:['Batata bolinha','kg','Hortifruti',9], batata:['Batata grande','un','Hortifruti',1.5], milho:['Milho verde em espiga','un','Hortifruti',2.5],
+ cabotia:['Abóbora cabotiá','kg','Hortifruti',6], abacaxi:['Abacaxi pérola maduro, com coroa','un','Hortifruti',9], banana:['Banana caturra madura','un','Hortifruti',.8],
+ manjericao:['Manjericão','maço','Hortifruti',5], rucula:['Rúcula','maço','Hortifruti',4], limao:['Limão','un','Hortifruti',.8],
+ ervas:['Alecrim e tomilho frescos','maço','Hortifruti',5], canela:['Canela em pó 30 g','pct','Mercearia',5], doce_leite:['Doce de leite 400 g','pote','Mercearia',16],
+ mel:['Mel 300 g','un','Mercearia',22], nozes:['Nozes 100 g','pct','Mercearia',15], tomate_seco:['Tomate seco 150 g','pote','Mercearia',16],
+ geleia_pimenta:['Geleia de pimenta 200 g','pote','Mercearia',15], farinha:['Farinha de mandioca torrada 500 g','pct','Mercearia',7],
+ bacon:['Bacon em cubos 200 g','pct','Frios e laticínios',12], manteiga:['Manteiga 200 g','tablete','Frios e laticínios',14],
+ provolone:['Provolone em disco (provoleta) 200 g','disco','Frios e laticínios',22], coalho:['Queijo coalho em espeto, pct com 7','pct','Frios e laticínios',24],
+ brie:['Queijo brie 125 g','un','Frios e laticínios',20], colonial:['Queijo colonial 300 g','un','Frios e laticínios',22],
+ pao_alho:['Pão de alho, pct com 5','pct','Padaria',16], aluminio:['Papel-alumínio 30 cm','rolo','Mercearia',8], vinho_branco_cozinha:['Vinho branco seco para marinada','garrafa','Bebidas',35],
+ cerveja:['Cerveja, latão 473 ml','un','Bebidas',6], tinto:['Vinho tinto','garrafa','Bebidas',80], branco:['Vinho branco ou rosé','garrafa','Bebidas',70],
+ refri:['Refrigerante 2 L','garrafa','Bebidas',10], agua:['Água mineral 1,5 L, com e sem gás','garrafa','Bebidas',4], gelo:['Gelo 5 kg','saco','Bebidas',15],
+ carvao:['Carvão vegetal 5 kg','saco','Fogo',30],
+ pao_frances:['Pão francês ou baguete','un','Padaria',1], molho_tomate:['Molho de tomate 340 g','un','Mercearia',6], mucarela:['Muçarela fatiada','kg','Frios e laticínios',45],
+ ovos:['Ovos','dúzia','Frios e laticínios',14], batata_doce:['Batata-doce','kg','Hortifruti',7], maca:['Maçã fuji','un','Hortifruti',1.5]
+};
+
+// carne: m(id,cat,nome,est,papel,rend,peca,precoKg,dur,desc,kgEsp,dica,pedido,extra)
+function m(id,cat,nome,est,papel,rend,peca,preco,dur,desc,kgEsp,dica,pedido,x){return Object.assign({id,cat,nome,est,papel,rend,peca,preco,dur,desc,kgEsp,dica,pedido,carne:true},x||{})}
+// outro: o(id,cat,nome,est,papel,dur,ing,dica,extra)  ing = [[chave, qtd, a cada N pessoas-equivalentes]]
+function o(id,cat,nome,est,papel,dur,ing,dica,x){return Object.assign({id,cat,nome,est,papel,dur,desc:0,ing,dica},x||{})}
+
+const ITENS=[
+ m('costelao','boi','Costelão (costela janela)','parrilla','principal',1.9,4.5,32,300,15,0,
+  'Parrilla na altura máxima, brasa baixa e constante. Sal grosso dos dois lados 30 min antes. Osso para baixo por cerca de 4 h; vire nos últimos 50 min para dourar a capa. Está pronta quando a carne recua 1,5 cm do osso e a sonda entra sem resistência, perto de 92 °C entre as fibras.',
+  'Costela janela (minga) inteira, com a capa de gordura e a membrana do osso.'),
+ m('asado_tira','boi','Asado de tira','parrilla','principal',1.6,0,45,25,3,0,
+  'Tiras de 3 a 4 cm. Brasa média-forte, parrilla baixa: 10 a 12 min do lado do osso, 8 min do lado da carne. Sal parrillero 10 min antes.',
+  'Costela do dianteiro serrada em tiras de 3 a 4 cm, corte transversal ao osso.'),
+ m('picanha','boi','Picanha no espeto','espeto-baixo','principal',1.05,1.2,90,40,5,1.3,
+  'Corte a peça em 3 bifes de 4 cm, dobre em C com a gordura por fora e espete. Sal grosso na hora. Fileira de baixo, 35 a 40 min até 54 °C no centro. Fatie fino contra a fibra.',
+  'Peça de 1,0 a 1,3 kg, capa de 1 cm, sem aparar.'),
+ m('entrana','boi','Entraña','parrilla','principal',1.1,.6,70,10,3,0,
+  'Retire a membrana externa. Parrilla baixa e brasa forte: 4 min por lado, sal parrillero no fim. Alvo de 54 a 56 °C. Fatie na diagonal contra a fibra.',
+  'Entraña fina (skirt). Se vier com membrana, você retira.'),
+ m('ojo','boi','Ojo de bife (ancho)','parrilla','principal',1,.5,95,16,5,0,
+  'Bifes de 4 cm em temperatura ambiente. Brasa forte, parrilla baixa: 7 a 8 min por lado, girando 90° no meio para marcar. Retire a 52 °C; o descanso leva a 55 °C.',
+  'Bifes de ancho com 4 cm, cerca de 500 g cada.'),
+ m('chorizo','boi','Bife de chorizo (contrafilé)','parrilla','principal',1,.45,65,14,5,0,
+  'Bife de 4 cm com a capa. Comece de pé, gordura na grelha, por 3 min. Depois 5 a 6 min por lado. Retire a 52 °C.',
+  'Contrafilé em bifes de 4 cm, com a capa de gordura.'),
+ m('vazio','boi','Vazio (fraldinha)','parrilla','principal',1.05,1.3,55,40,5,0,
+  'Peça inteira. Gordura para baixo, parrilla média, 25 min; vire e mais 12 a 15 min. Ponto de 57 °C. A fibra é longa: fatie bem fino contra ela.',
+  'Vazio inteiro com a gordura, sem limpar.'),
+ m('maminha','boi','Maminha no espeto','espeto-alto','principal',1.05,1.3,55,55,5,1.4,
+  'Peça inteira, gordura para fora. Fileira de cima, giro contínuo, 50 a 55 min até 55 °C. Sal grosso ao ir para o fogo.',
+  'Maminha inteira com a capa.'),
+ m('tomahawk','boi','Tomahawk','parrilla','principal',1.4,1.2,120,50,10,0,
+  'Selagem reversa: parrilla alta e brasa fraca até 45 °C no centro (35 a 40 min). Depois parrilla baixa e brasa forte, 2 min por lado e 1 min na borda de gordura. Descanse 10 min antes de tirar do osso.',
+  'Tomahawk de 5 cm, cerca de 1,2 kg, osso limpo.'),
+ m('denver','boi','Denver steak','parrilla','principal',1,.4,70,12,4,0,
+  'Bifes de 3 cm. Brasa forte, 5 a 6 min por lado, retire a 54 °C. O marmoreio aguenta um ponto um pouco mais alto sem secar.',
+  'Denver (miolo do acém) em bifes de 3 cm.'),
+ m('flatiron','boi','Flat iron','parrilla','principal',1,.4,75,10,4,0,
+  'Brasa forte, 4 a 5 min por lado até 54 °C. Fatie contra a fibra.',
+  'Flat iron (raquete) já sem o nervo central.'),
+ m('shortrib','boi','Short rib','parrilla','principal',1.8,1,60,180,15,0,
+  'Fogo lento: parrilla alta e brasa baixa por 2,5 a 3 h, até 92 a 95 °C entre as fibras. Na última meia hora, pincele manteiga de ervas. Fatie entre os ossos.',
+  'Short rib em bloco de 3 ossos.'),
+ m('matambre','boi','Matambre','parrilla','principal',1.15,1.5,45,70,5,0,
+  'Gordura para baixo, parrilla média, 50 min; vire e 15 a 20 min do lado da carne. Fica macio com brasa baixa; brasa forte deixa borrachudo.',
+  'Matambre bovino inteiro, com a membrana.'),
+ m('cupim','boi','Cupim no espeto','espeto-alto','principal',1.25,2,45,270,15,2,
+  'Peça inteira, giro lento na fileira de cima, 4 a 4,5 h até 90 °C. Para ficar mais suculento, embrulhe em alumínio depois de 2 h de fogo.',
+  'Cupim inteiro (cerca de 2 kg), sem aparar a gordura.'),
+ m('linguica','porco','Linguiça campeira','espeto-baixo','entrada',1,0,35,35,0,1.5,
+  'Espeto duplo, fileira de baixo, giro contínuo. Não fure a tripa. 30 a 35 min até 72 °C no centro.',
+  'Linguiça campeira fina ou Blumenau, em gomos.'),
+ m('costelinha','porco','Costelinha suína com barbecue','espeto-alto','principal',1.7,1.2,35,100,5,1.4,
+  'Retire a membrana dos ossos. Espete em zigue-zague no espeto duplo, fileira de cima, 80 a 90 min. Pincele o barbecue só nos últimos 15 min; antes disso o açúcar queima.',
+  'Costelinha suína em manta inteira.'),
+ m('panceta','porco','Panceta pururuca','espeto-alto','principal',1.2,1,38,110,5,1.5,
+  'Seque bem a pele e salgue com sal grosso na véspera, sem cobrir. 90 min na fileira de cima; nos últimos 15 a 20 min, passe para a de baixo para a pele estourar.',
+  'Panceta (barriga) em peça com pele, cerca de 1 kg.',{prep:[['vespera','Panceta: secar a pele e salgar com sal grosso, sem cobrir, na geladeira']]}),
+ m('morcilla','porco','Morcilla','parrilla','entrada',1,0,40,15,0,0,
+  'Já vem cozida: só aquecer e criar crosta. Parrilla média, 6 a 7 min por lado, sem furar.',
+  'Morcilla em gomos.'),
+ m('coracao','frango','Coração de frango','espeto-baixo','entrada',1,0,40,28,0,1,
+  'Limpe as veias e a gordura da ponta. Sal grosso, espeto fino, fileira de baixo, 25 a 30 min.',
+  'Coração de frango limpo.'),
+ m('asa','frango','Coxinha da asa','espeto-baixo','entrada',1.5,0,25,45,0,1.2,
+  'Seque bem e tempere com sal, alho e limão 1 h antes. Fileira de baixo, 40 a 45 min, até a pele ficar crocante e o osso soltar.',
+  'Coxinha da asa.',{prep:[[-60,'Temperar a coxinha da asa com sal, alho e limão']]}),
+ m('sobrecoxa','frango','Sobrecoxa desossada','parrilla','principal',1.05,0,22,28,3,0,
+  'Pele para baixo, parrilla média, 15 min; vire e 10 a 12 min até 75 °C. Pele seca é o que deixa a pele crocante.',
+  'Sobrecoxa desossada com pele.'),
+ m('galeto','frango','Galeto no espeto','espeto-alto','principal',1.6,.6,25,70,5,1.2,
+  'Marinada de vinho branco, alho, sálvia e limão por 4 h. Fileira de cima, 60 a 70 min até 75 °C na coxa.',
+  'Galetos inteiros de cerca de 600 g.',{prep:[[-240,'Marinar o galeto em vinho branco, alho, sálvia e limão']],ing:[['vinho_branco_cozinha',1,12]]}),
+ m('costela_cordeiro','cordeiro','Costela de cordeiro','espeto-alto','principal',1.7,1.5,70,100,5,1.5,
+  'Sal grosso e alecrim. Fileira de cima, 90 a 100 min, até a gordura dourar e ficar crocante.',
+  'Costela de cordeiro inteira, em manta.'),
+ m('carre','cordeiro','Carré de cordeiro','parrilla','principal',1.4,.5,160,15,5,0,
+  'Lado da gordura primeiro, 4 min; depois 3 a 4 min por lado. Retire a 55 °C para ponto rosado. Fatie entre as costeletas.',
+  'Carré francês de cordeiro, cerca de 500 g e 8 costeletas.'),
+ m('paleta','cordeiro','Paleta de cordeiro','espeto-alto','principal',1.5,1.8,65,150,10,1.8,
+  'Marinada de alho, alecrim e azeite na véspera. Fileira de cima, 2,5 h, até soltar do osso.',
+  'Paleta de cordeiro inteira, com osso.',{prep:[['vespera','Paleta: marinar em alho, alecrim e azeite']]}),
+ m('salmao','mar','Salmão com pele','parrilla','principal',1,1.2,110,18,0,0,
+  'Pele para baixo sobre a frigideira furada untada, parrilla média, 15 a 18 min sem virar. Retire a 50 °C: centro rosado e úmido.',
+  'Lado de salmão com pele, sem espinhas.',{secao:'Peixaria'}),
+ m('camarao','mar','Camarão GG no espeto','espeto-baixo','entrada',1.6,0,90,8,0,1,
+  'Com casca e sem a tripa. Pincele manteiga de alho. Fileira de baixo, 6 a 8 min; tire assim que ficar rosado e opaco.',
+  'Camarão cinza GG com casca, sem a tripa.',{secao:'Peixaria'}),
+ m('polvo','mar','Polvo na brasa','parrilla','entrada',2,1.5,140,10,0,0,
+  'Cozinhe antes por 40 min em água sem sal, até a faca entrar fácil. Na parrilla é só para marcar: brasa forte, 4 a 5 min por lado, azeite e páprica.',
+  'Polvo inteiro limpo, cerca de 1,5 kg.',{secao:'Peixaria',prep:[[-60,'Cozinhar o polvo por 40 min em água sem sal']]}),
+ m('tainha','mar','Tainha inteira','parrilla','principal',2,1.2,30,30,0,0,
+  'Escamada e aberta em borboleta, ou inteira com cortes na pele. Na grelha-sanduíche, parrilla média, 15 min de cada lado, pele primeiro. Sal grosso e limão.',
+  'Tainha fresca escamada e limpa, aberta em borboleta.',{secao:'Peixaria'}),
+
+ m('choripan','porco','Choripán','parrilla','entrada',1,0,35,16,0,0,
+  'Linguiça aberta ao meio no comprimento (em mariposa), parrilla média, 6 a 8 min por lado. Pão aberto na grelha de cima por 2 min. Monte com chimichurri ou criolla.',
+  'Linguiça parrillera ou campeira grossa, em gomos.',{ing:[['pao_frances',1,1]]}),
+ m('matambre_pizza','boi','Matambre à pizza','parrilla','principal',1.15,1.5,45,85,5,0,
+  'Asse como o matambre comum: 50 min com a gordura para baixo, parrilla média. Vire, cubra o lado da carne com molho de tomate, muçarela e orégano e deixe mais 20 a 25 min com a parrilla alta, até o queijo derreter.',
+  'Matambre bovino inteiro, com a membrana.',{ing:[['molho_tomate',1,10],['mucarela',.3,8],['oregano',1,20]]}),
+ o('morron','brasa','Morrón con huevo','parrilla','acomp',30,[['pimentao',1,2],['ovos',1,12],['mucarela',.1,6]],
+  'Pimentão vermelho cortado ao meio, sem sementes, casca para baixo na parrilla média por 15 min. Quebre um ovo em cada metade, sal e queijo; mais 12 a 15 min, até a clara firmar.'),
+ o('batata_doce','brasa','Batata-doce no rescoldo','rescoldo','acomp',50,[['batata_doce',.25,1.5],['aluminio',1,20]],
+  'Inteira, com casca, em alumínio, na cinza com brasa por 45 a 50 min. Abra com manteiga e sal em flocos.'),
+ o('alho_assado','brasa','Alho assado no rescoldo','rescoldo','acomp',45,[['alho',1,3],['azeite',1,20],['aluminio',1,30]],
+  'Corte o topo da cabeça, fio de azeite e sal, embrulhe em alumínio e deixe na borda da brasa por 40 a 45 min. Os dentes viram pasta para o pão ou para a carne.'),
+ o('abacaxi','brasa','Abacaxi na rotativa','espeto-alto','acomp',70,[['abacaxi',1,8],['canela',1,20],['mascavo',1,12],['doce_leite',1,10]],
+  'Descasque inteiro e mantenha a coroa como cabo. Esfregue açúcar mascavo e canela. Fileira de cima, giro contínuo, 60 a 70 min. Corte fatias finas por fora conforme carameliza e pingue doce de leite morno com a bisnaga.',
+  {assin:true,porEsp:2}),
+ o('legumes_cesto','brasa','Legumes no cesto rotativo','cesto','acomp',40,[['batata_bolinha',.15,1],['cebola_roxa',.1,1],['pimentao',1,3],['abobrinha',1,3],['azeite',1,15],['ervas',1,10]],
+  'Batata bolinha pré-cozida por 10 min. Corte o resto em pedaços do mesmo tamanho, com azeite, sal e alecrim. Cesto na fileira de baixo, 35 a 40 min. Encha só até 2/3 para tudo girar e dourar.',
+  {prep:[[-30,'Pré-cozinhar a batata bolinha por 10 min']]}),
+ o('legumes_frigideira','brasa','Legumes na frigideira furada','frigideira','acomp',18,[['abobrinha',1,3],['berinjela',1,4],['cogumelo',1,4],['tomate_cereja',1,4],['pimentao',1,3],['azeite',1,15]],
+  'Frigideira furada sobre a parrilla baixa, brasa média. Borrife azeite, mexa a cada 4 min, 15 a 18 min. Sal parrillero só no fim para não soltar água.'),
+ o('cebola_rescoldo','brasa','Cebola inteira no rescoldo','rescoldo','acomp',60,[['cebola',.2,2],['aluminio',1,30]],
+  'Com casca, embrulhada em alumínio, na cinza quente sob a parrilla, 50 a 60 min. Abra e finalize com manteiga e sal parrillero.'),
+ o('batata_rescoldo','brasa','Batata no rescoldo','rescoldo','acomp',60,[['batata',1,1],['manteiga',1,8],['aluminio',1,20]],
+  'Batata grande lavada, em alumínio, na cinza com brasa, 50 a 60 min, virando na metade. Está pronta quando um palito entra sem resistência. Sirva aberta com manteiga e chimichurri.'),
+ o('milho','brasa','Milho na grelha','parrilla','acomp',20,[['milho',1,1.5],['manteiga',1,10]],
+  'Pré-cozido por 8 min. Parrilla média, 15 a 20 min girando e pincelando manteiga de ervas.',
+  {prep:[[-15,'Pré-cozinhar o milho por 8 min']]}),
+ o('abobora','brasa','Abóbora cabotiá caramelizada','parrilla','acomp',30,[['cabotia',1,6],['mel',1,15],['ervas',1,10]],
+  'Fatias de 2 cm com casca. Parrilla alta, 15 min por lado. Pincele mel e tomilho nos últimos 5 min.'),
+ o('pao_alho','brasa','Pão de alho','superior','entrada',10,[['pao_alho',1,5]],
+  'Grelha de cima, 8 a 10 min virando: doura sem queimar o fundo.'),
+ o('farofa','brasa','Farofa de bacon','cozinha','acomp',20,[['farinha',1,8],['bacon',1,8],['cebola',.2,8],['manteiga',1,12]],
+  'Doure o bacon, depois a cebola na gordura dele; junte a manteiga e a farinha aos poucos. Pode ser feita até 1 h antes.'),
+
+ o('provoleta_caprese','ferro','Provoleta caprese','ferro','entrada',10,[['provolone',1,4],['tomate_cereja',1,8],['manjericao',1,10],['oregano',1,20],['azeite',1,20]],
+  'Panelinha de ferro pré-aquecida por 5 min. Provolone gelado. 4 min até a base criar crosta; cubra com tomate cereja, orégano e manjericão e deixe mais 4 a 5 min. Sirva na própria panela.'),
+ o('provoleta_mel','ferro','Provoleta com mel e nozes','ferro','entrada',9,[['provolone',1,4],['mel',1,12],['nozes',1,8]],
+  'Mesmo preparo da provoleta. Finalize fora do fogo com mel e nozes tostadas.'),
+ o('provoleta_seco','ferro','Provoleta com tomate seco e rúcula','ferro','entrada',9,[['provolone',1,4],['tomate_seco',1,10],['rucula',1,10]],
+  'Mesmo preparo da provoleta. Tomate seco por cima nos últimos 3 min; rúcula crua na saída.'),
+ o('coalho','ferro','Queijo coalho com mel','parrilla','entrada',8,[['coalho',1,6],['mel',1,15]],
+  'Parrilla média, 3 a 4 min por lado até dourar. O mel vai só no prato.'),
+ o('brie','ferro','Brie com geleia de pimenta','ferro','entrada',12,[['brie',1,4],['geleia_pimenta',1,8]],
+  'Faça cortes em cruz na casca e cubra com a geleia. Panelinha na parrilla alta por 10 a 12 min, até o centro ceder ao toque.'),
+
+ o('cebola_caramelo','ferro','Cebola caramelizada no ferro','ferro','acomp',35,[['cebola',.3,4],['manteiga',1,10],['mascavo',1,15]],
+  'Cebola em meias-luas na panelinha com manteiga, parrilla média, 30 a 35 min mexendo a cada 5 min. Uma colher de açúcar mascavo e um fio de vinagre no fim. Vai sobre o choripán e os bifes.'),
+ o('maca','sobremesa','Maçã assada com canela e doce de leite','rescoldo','sobremesa',40,[['maca',1,1],['canela',1,20],['mascavo',1,15],['doce_leite',1,10],['aluminio',1,20]],
+  'Retire o miolo pelo topo e recheie com açúcar mascavo, canela e manteiga. Embrulhe em alumínio e deixe no rescoldo por 35 a 40 min. Sirva com doce de leite morno.'),
+ o('banana','sobremesa','Banana na brasa com canela','parrilla','sobremesa',15,[['banana',1,1],['canela',1,20],['mascavo',1,15]],
+  'Com casca, na parrilla média, 12 a 15 min, até a casca escurecer inteira. Abra no comprimento e finalize com canela e açúcar mascavo.'),
+ o('doce_queijo','sobremesa','Queijo colonial com doce de leite','ferro','sobremesa',8,[['colonial',1,6],['doce_leite',1,8]],
+  'Fatias de 1,5 cm na panelinha untada, 3 min por lado; doce de leite morno por cima.'),
+
+ o('sal','molho','Sal parrillero e sal grosso','cozinha','acomp',0,[['sal_parrillero',1,30],['sal_grosso',1,20]],
+  'Sal parrillero (entrefino ou em flocos) para cortes de parrilla, na hora ou no fim. Sal grosso fica para espetos e peças grandes.',{semEvento:true}),
+ o('chimichurri','molho','Chimichurri','cozinha','acomp',0,[['salsinha',1,10],['oregano',1,10],['alho',1,10],['calabresa',1,20],['vinagre_tinto',1,20],['azeite',1,10]],
+  'Salsinha picada a faca, 2 colheres de orégano, 3 dentes de alho, calabresa, sal. Uma parte de vinagre para duas de azeite. Faça 2 h antes ou na véspera.',{prepAt:-180}),
+ o('barbecue','molho','Barbecue para costelinha','cozinha','acomp',0,[['ketchup',1,10],['mascavo',1,12],['vinagre_maca',1,20],['mostarda',1,15],['paprica',1,20],['molho_ingles',1,20],['alho',1,15]],
+  'Ketchup, açúcar mascavo, vinagre de maçã, mostarda, páprica defumada, alho e molho inglês. Ferva em fogo baixo por 15 a 20 min até napar a colher.',{prepAt:-150}),
+ o('criolla','molho','Salsa criolla','cozinha','acomp',0,[['tomate',.3,8],['cebola_roxa',.2,8],['pimentao',1,8],['vinagre_tinto',1,20],['azeite',1,20]],
+  'Tomate sem sementes, cebola roxa e pimentão em cubos de 0,5 cm. Azeite, vinagre de vinho tinto, sal e orégano. Até 1 h antes; depois disso solta água.',{prepAt:-60}),
+ o('manteiga_ervas','molho','Manteiga de ervas e alho','cozinha','acomp',0,[['manteiga',1,10],['ervas',1,10],['alho',1,15],['limao',1,15]],
+  'Manteiga em temperatura ambiente, alho e ervas picados, raspa de limão, sal em flocos. Enrole em filme e gele por 1 h. Uma rodela sobre o bife no descanso.',{prepAt:-120}),
+
+ o('cerveja','bebida','Cerveja','cozinha','acomp',0,null,'Conta de 1,2 L por adulto e 1,8 L por comilão, em latões de 473 ml.',{beb:p=>Math.ceil((p.a*1.2+p.k*1.8)/.473),k:'cerveja'}),
+ o('tinto','bebida','Vinho tinto','cozinha','acomp',0,null,'Uma garrafa a cada 3 adultos. O rótulo sugerido aparece na leitura do assador.',{beb:p=>Math.ceil((p.a+p.k)/3),k:'tinto'}),
+ o('branco','bebida','Vinho branco ou rosé','cozinha','acomp',0,null,'Uma garrafa a cada 4 adultos. Vai bem com peixe, camarão e frango.',{beb:p=>Math.ceil((p.a+p.k)/4),k:'branco'}),
+ o('refri','bebida','Refrigerante','cozinha','acomp',0,null,'600 ml por criança e 250 ml por adulto, em garrafas de 2 L.',{beb:p=>Math.ceil((p.c*.6+(p.a+p.k)*.25)/2),k:'refri'}),
+ o('agua','bebida','Água','cozinha','acomp',0,null,'500 ml por pessoa, metade com gás.',{beb:p=>Math.ceil((p.c+p.a+p.k)*.5/1.5),k:'agua'}),
+ o('gelo','bebida','Gelo','cozinha','acomp',0,null,'Um saco de 5 kg a cada 8 pessoas.',{beb:p=>Math.max(1,Math.ceil((p.c+p.a+p.k)/8)),k:'gelo'})
+];
+const POR_ID=Object.fromEntries(ITENS.map(i=>[i.id,i]));
+
+const PRESETS=[
+ {id:'raiz',n:'Domingo raiz',sel:['costelao','linguica','coracao','pao_alho','farofa','abacaxi','sal','chimichurri','cerveja','refri','gelo']},
+ {id:'gourmet',n:'Parrilla gourmet',sel:['entrana','ojo','provoleta_caprese','legumes_frigideira','batata_rescoldo','abacaxi','sal','chimichurri','criolla','manteiga_ervas','tinto','agua','gelo']},
+ {id:'familia',n:'Família e criançada',sel:['picanha','linguica','asa','coalho','milho','pao_alho','legumes_cesto','banana','sal','chimichurri','cerveja','refri','agua','gelo']},
+ {id:'lento',n:'Fogo lento',sel:['costelao','cupim','panceta','costelinha','barbecue','abacaxi','cebola_rescoldo','farofa','sal','chimichurri','tinto','cerveja','gelo']},
+ {id:'mar',n:'Mar e brasa',sel:['salmao','camarao','polvo','legumes_frigideira','batata_rescoldo','provoleta_seco','manteiga_ervas','criolla','sal','branco','agua','gelo']}
+];
+
+const ARSENAL=[
+ {id:'bisnaga',n:'Bisnaga dosadora de bico fino, 250 ml',t:'Pinga o doce de leite morno sobre o abacaxi, em fio ou em gotas. Amorne em banho-maria; bico de 3 a 4 mm.',usa:['abacaxi','doce_queijo','banana']},
+ {id:'borrifador',n:'Borrifador de azeite de bomba manual',t:'Névoa fina nos legumes, no peixe e no camarão sem encharcar. Prefira inox ou vidro, sem gás propelente.',usa:['legumes_frigideira','legumes_cesto','salmao','camarao','polvo','abobora']},
+ {id:'termometro',n:'Termômetro de leitura instantânea',t:'Ponto exato em 2 a 3 segundos. É a diferença entre entraña a 55 °C e entraña passada.',usa:['entrana','ojo','chorizo','vazio','picanha','maminha','tomahawk','denver','flatiron','carre','salmao','sobrecoxa','galeto']},
+ {id:'sonda',n:'Termômetro sonda sem fio',t:'Fica na peça por horas e avisa no celular. Para costelão, cupim, short rib e paleta.',usa:['costelao','cupim','shortrib','paleta','tomahawk']},
+ {id:'luvas',n:'Luvas de aramida',t:'Resistem a 500 °C. Para tirar espetos, mexer o braseiro e pegar a panelinha de ferro.',usa:['*esp','*ferro']},
+ {id:'pinca',n:'Pinça longa de 40 cm',t:'Vira sem furar. Garfo faz a carne perder suco.',usa:['*parrilla']},
+ {id:'sanduiche',n:'Grelha-sanduíche para peixe',t:'Vira a tainha inteira sem desmanchar a pele.',usa:['tainha','salmao']},
+ {id:'faca_abacaxi',n:'Faca serrilhada longa',t:'Fatia fino o abacaxi girando no espeto, de fora para dentro, conforme carameliza.',usa:['abacaxi']},
+ {id:'faca',n:'Faca de churrasco de 10 polegadas e chaira',t:'Fatias finas contra a fibra em entraña, vazio e picanha. Faca cega amassa a carne.',usa:['*carne']},
+ {id:'tabua',n:'Tábua grande com canaleta',t:'Segura o suco no descanso e no fatiamento.',usa:['*carne']},
+ {id:'pincel',n:'Pincel de silicone',t:'Barbecue na costelinha; manteiga no milho, no camarão e no short rib.',usa:['costelinha','milho','shortrib','camarao','abobora']},
+ {id:'escova',n:'Escova de grelha em inox',t:'Limpa a parrilla ainda quente, antes e depois.',usa:['*parrilla']},
+ {id:'soprador',n:'Soprador manual ou fole',t:'Reaviva a brasa da lenha sem levantar cinza sobre a comida.',usa:['*todos']},
+ {id:'papel',n:'Papel-alumínio e papel-manteiga',t:'Descanso do costelão e do cupim; batata e cebola no rescoldo.',usa:['costelao','cupim','batata_rescoldo','cebola_rescoldo']}
+];
+
+/* ===================== estado ===================== */
+const hojeISO=()=>{const d=new Date();return new Date(d.getTime()-d.getTimezoneOffset()*6e4).toISOString().slice(0,10)};
+const LS={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const rascunho=LS.get('tp-rascunho',null);
+const S=Object.assign({c:2,a:6,k:2,hora:'13:00',data:hojeISO(),sel:PRESETS[0].sel.slice(),preset:'raiz',carvao:false,conv:[],gasto:null,listaAberta:false},rascunho||{});
+S.sel=S.sel.filter(id=>POR_ID[id]); if(!Array.isArray(S.conv))S.conv=[];
+let tab='montar', abertos=new Set(), pinSel=null, editPreco=null, ticks=LS.get('tp-ticks',{});
+const CFG0=()=>({precos:{},arsenal:{},turma:[],pix:''});
+const NOVO0=()=>({nota:0,titulo:'',obs:'',fbCarne:'',fbBeb:''});
+let CFG=CFG0(), HIST=[], sb=null, sessao=null, fotoURL={}, histFiltro='todos', novo=NOVO0(), apagar=null, fotoAberta=null, enviandoFoto=null;
+let chat=[], chefCtl=null, chefPensando=false, chefErro='';
+const salvarRascunho=()=>LS.set('tp-rascunho',{c:S.c,a:S.a,k:S.k,hora:S.hora,data:S.data,sel:S.sel,preset:S.preset,carvao:S.carvao,conv:S.conv,gasto:S.gasto,listaAberta:S.listaAberta});
+// quem vem: a lista de nomes, quando existe, manda na contagem
+function gente(){
+  if(!S.conv.length)return {c:S.c,a:S.a,k:S.k};
+  const g={c:0,a:0,k:0};S.conv.forEach(x=>g[x.t]=(g[x.t]||0)+1);return g;
+}
+// aprendizado: média dos últimos 6 retornos de "como foi"
+const FB={muito:{n:'Sobrou muito',v:-.15},pouco:{n:'Sobrou um pouco',v:-.06},certo:{n:'Na medida',v:0},faltou:{n:'Faltou',v:.12}};
+function calibra(campo){
+  const xs=HIST.filter(h=>h.fb&&FB[h.fb[campo]]).slice(0,6).map(h=>FB[h.fb[campo]].v);
+  if(!xs.length)return {f:0,n:0};
+  return {f:Math.max(-.3,Math.min(.3,xs.reduce((s,v)=>s+v,0)/xs.length)),n:xs.length};
+}
+
+/* ===================== cálculo ===================== */
+const nf=(n,d=0)=>n.toLocaleString('pt-BR',{minimumFractionDigits:d,maximumFractionDigits:d});
+const brl=n=>'R$ '+nf(n,n<10?2:0);
+const up=(x,s)=>Math.ceil(x/s-1e-9)*s;
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const toMin=h=>{const [a,b]=(h||'13:00').split(':').map(Number);return a*60+b};
+const hhmm=t=>{t=((Math.round(t)%1440)+1440)%1440;return String(Math.floor(t/60)).padStart(2,'0')+':'+String(t%60).padStart(2,'0')};
+const ehEsp=e=>e==='espeto-alto'||e==='espeto-baixo'||e==='cesto';
+const preco=(k,base)=>CFG.precos[k]!=null?CFG.precos[k]:base;
+function plural(un,q){return (q>1&&un!=='un'&&un!=='kg')?un+'s':un}
+function qtd(q,un){if(un==='kg')return q<1?nf(q*1000,0)+' g':nf(q,1)+' kg';return nf(q,Number.isInteger(q)?0:1)+' '+plural(un,q)}
+
+function calc(){
+  const p=gente(), pessoas=p.c+p.a+p.k, AE=.6*p.c+p.a+1.3*p.k, calC=calibra('carne'), calB=calibra('bebida');
+  const sel=S.sel.map(id=>POR_ID[id]).filter(Boolean);
+  const carnes=sel.filter(i=>i.carne), lados=sel.filter(i=>LADO.includes(i.cat));
+  const nl=lados.length;
+  const nivel=nl<=1?{f:1.15,n:'pouco acompanhamento',d:'+15%'}:nl<=3?{f:1,n:'equilibrado',d:'base'}:{f:.85,n:'mesa farta',d:'−15%'};
+  const GR={c:200,a:400,k:600};
+  const gBase=S.conv.length?S.conv.filter(x=>!/veget|vegan/i.test(x.obs||'')).reduce((s,x)=>s+GR[x.t],0):GR.c*p.c+GR.a*p.a+GR.k*p.k;
+  const gLimpo=gBase*nivel.f*(1+calC.f);
+  const W=carnes.reduce((s,i)=>s+PESO[i.papel],0)||1;
+  const linhas={}; let custo=0, kgCompra=0;
+  const add=(key,nome,q,un,secao,pu,nota,ped)=>{const L=linhas[key]||(linhas[key]={key,nome,q:0,un,secao,pu,nota,ped});L.q+=q};
+  const espN={};
+  for(const i of carnes){
+    const kgL=gLimpo/1000*PESO[i.papel]/W;
+    const kg=Math.max(.3,up(kgL*i.rend,.1));
+    i._kg=kg; kgCompra+=kg;
+    const pecas=i.peca?Math.max(1,Math.round(kg/i.peca)):0;
+    add(i.id,i.nome.replace(/ no espeto| na brasa/,''),kg,'kg',i.secao||'Açougue',preco(i.id,i.preco),pecas?`≈ ${pecas} ${pecas>1?'peças':'peça'} de ${nf(i.peca,1)} kg`:'',i.pedido);
+    if(ehEsp(i.est))espN[i.id]=Math.max(1,Math.ceil(kg/(i.kgEsp||1.5)));
+    (i.ing||[]).forEach(([k,q,por])=>{const g=ING[k];add(k,g[0],q*Math.max(1,Math.ceil(AE/por)),g[1],g[2],preco(k,g[3]))});
+  }
+  for(const i of sel.filter(i=>!i.carne)){
+    if(i.beb){const g=ING[i.k];const n=i.k==='gelo'?i.beb(p):Math.max(1,Math.ceil(i.beb(p)*(1+calB.f)-.2));add(i.k,g[0],n,g[1],g[2],preco(i.k,g[3]));continue}
+    (i.ing||[]).forEach(([k,q,por])=>{const g=ING[k];const n=q*Math.max(1,Math.ceil(AE/por));add(k,g[0],g[1]==='kg'?up(n,.1):n,g[1],g[2],preco(k,g[3]))});
+    if(ehEsp(i.est))espN[i.id]=i.id==='abacaxi'?Math.max(1,Math.ceil(Math.ceil(AE/8)/(i.porEsp||1))):1;
+  }
+  const ev=cronograma(sel,espN);
+  if(S.carvao&&ev.espSpan>0){const n=Math.max(1,Math.ceil(ev.espSpan/90));add('carvao',ING.carvao[0],n,'saco','Fogo',preco('carvao',ING.carvao[3]))}
+  for(const L of Object.values(linhas)){L.total=L.q*L.pu;custo+=L.total}
+  return {p,pessoas,AE,sel,carnes,lados,nivel,gLimpo,kgCompra,linhas:Object.values(linhas),custo,espN,ev,calC,calB};
+}
+
+function cronograma(sel,espN){
+  const serve=toMin(S.hora), ev=[]; let fogo=Infinity, esp=Infinity, espFim=-Infinity, carne=Infinity;
+  const ints=[];
+  for(const i of sel){
+    if(i.cat==='bebida'||i.semEvento)continue;
+    if(i.prepAt!=null){ev.push({t:serve+i.prepAt,k:'prep',tx:'Preparar '+i.nome,sub:'Cozinha'});continue}
+    const pronto=serve+(PRONTO[i.papel]??0);
+    if(i.est==='cozinha'){ev.push({t:pronto-i.dur-10,k:'prep',tx:'Preparar '+i.nome,sub:'Cozinha'});continue}
+    const ini=pronto-i.dur-(i.desc||0);
+    ev.push({t:ini,k:'entra',tx:i.nome,sub:EST[i.est].n+(espN[i.id]>1?` · ${espN[i.id]} espetos`:''),est:i.est,id:i.id});
+    ev.push(i.desc?{t:pronto-i.desc,k:'sai',tx:'Retirar '+i.nome,sub:`Descanso de ${i.desc} min`,id:i.id}:{t:pronto,k:'sai',tx:'Servir '+i.nome,sub:EST[i.est].n,id:i.id});
+    (i.prep||[]).forEach(([o,tx])=>ev.push(o==='vespera'?{t:-1e6,vespera:true,k:'prep',tx,sub:'Véspera'}:{t:ini+o,k:'prep',tx,sub:'Preparo'}));
+    fogo=Math.min(fogo,ini);
+    if(ehEsp(i.est)){esp=Math.min(esp,ini);espFim=Math.max(espFim,pronto);ints.push({a:ini,b:pronto,est:i.est,n:espN[i.id]||1,nome:i.nome})}
+    if(i.carne&&i.cat!=='mar')carne=Math.min(carne,ini);
+  }
+  if(fogo<Infinity){
+    ev.push({t:fogo-45,k:'fogo',tx:'Acender o braseiro',sub:'Lenha leva cerca de 40 min para dar brasa'});
+    const fim=serve+40;
+    for(let t=fogo+45;t<fim-30;t+=50)ev.push({t,k:'fogo',tx:'Repor lenha no braseiro',sub:'Puxe brasa nova para baixo da parrilla'});
+  }
+  if(esp<Infinity)ev.push({t:esp-20,k:'fogo',tx:S.carvao?'Acender carvão no fosso dos espetos':'Puxar brasa para o fosso dos espetos',sub:'Espetos'});
+  if(carne<Infinity)ev.push({t:carne-40,k:'prep',tx:'Tirar as carnes da geladeira',sub:'Peixe só na hora'});
+  if(sel.some(i=>i.cat==='bebida'))ev.push({t:serve-180,k:'prep',tx:'Bebidas no gelo',sub:'Bebidas'});
+  ev.push({t:serve,k:'serve',tx:'Hora de servir'});
+  ev.sort((x,y)=>x.t-y.t||(x.k==='serve')-(y.k==='serve'));
+  // pico de espetos por fileira
+  const pico={};
+  for(const e of ['espeto-alto','espeto-baixo','cesto']){
+    const xs=ints.filter(x=>x.est===e);let m=0;
+    for(const x of xs){const n=xs.filter(y=>y.a<x.b&&y.b>x.a&&y.a<=x.a).reduce((s,y)=>s+y.n,0);m=Math.max(m,n)}
+    pico[e]=m;
+  }
+  ev.pico=pico; ev.espSpan=esp<Infinity?espFim-esp:0; ev.inicio=fogo<Infinity?fogo-45:serve;
+  return ev;
+}
+
+function leitura(C){
+  const L=[], ids=new Set(S.sel), tem=a=>a.some(x=>ids.has(x));
+  if(!C.pessoas)return [{c:'alerta',t:'Informe quantas pessoas vêm.'}];
+  if(C.carnes.length){
+    L.push({c:'ok',t:`${C.lados.length} ${C.lados.length===1?'acompanhamento':'acompanhamentos'}: ${C.nivel.n}. Carne ajustada em ${C.nivel.d}, ${nf(C.gLimpo/C.AE,0)} g limpos por adulto.`});
+  }else L.push({c:'alerta',t:'Nenhuma carne escolhida ainda.'});
+  const pct=f=>(f>0?'+':'−')+nf(Math.abs(f*100),0)+'%';
+  if(C.calC.n&&C.calC.f)L.push({c:'ok',t:`Aprendido com ${C.calC.n} ${C.calC.n>1?'churrascos':'churrasco'}: carne ${pct(C.calC.f)}.`});
+  if(C.calB.n&&C.calB.f)L.push({c:'ok',t:`Aprendido com ${C.calB.n} ${C.calB.n>1?'churrascos':'churrasco'}: bebida ${pct(C.calB.f)}.`});
+  const obs=S.conv.filter(x=>x.obs&&x.obs.trim());
+  const conta=re=>obs.filter(x=>re.test(x.obs.toLowerCase()));
+  const veg=conta(/veget|vegan/), glu=conta(/gl[uú]ten|cel[ií]ac/), lac=conta(/lactose|leite/), mar=conta(/camar|fruto|marisco|peixe/);
+  if(veg.length)L.push({c:'alerta',t:`${veg.map(x=>x.n).join(', ')}: sem carne. Garanta legumes, provoleta, morrón con huevo ou batata no rescoldo.`});
+  if(glu.length)L.push({c:'alerta',t:`${glu.map(x=>x.n).join(', ')}: sem glúten. Farofa de mandioca serve; pão de alho e choripán não.`});
+  if(lac.length)L.push({c:'alerta',t:`${lac.map(x=>x.n).join(', ')}: sem lactose. Provoleta, brie e manteiga de ervas ficam de fora para eles.`});
+  if(mar.length&&tem(['camarao','polvo','salmao','tainha']))L.push({c:'perigo',t:`${mar.map(x=>x.n).join(', ')} tem restrição a frutos do mar ou peixe, e há peixe no cardápio. Use pinça e grelha separadas.`});
+  const outras=obs.filter(x=>!veg.includes(x)&&!glu.includes(x)&&!lac.includes(x)&&!mar.includes(x));
+  if(outras.length)L.push({c:'dica',t:'Observações: '+outras.map(x=>`${x.n}: ${x.obs}`).join('; ')+'.'});
+  if(C.lados.length<=1&&C.carnes.length)L.push({c:'dica',t:'Pouca guarnição. Abacaxi na rotativa ou provoleta seguram a fome sem pesar na conta de carne.'});
+  if(C.p.c>0&&!tem(['linguica','coracao','asa','coalho','milho','banana','pao_alho']))L.push({c:'dica',t:'Tem criança: linguiça, coxinha da asa, queijo coalho e milho costumam agradar.'});
+  if(C.carnes.some(i=>i.est==='parrilla')&&!tem(['chimichurri','criolla','manteiga_ervas']))L.push({c:'dica',t:'Sem molho para os cortes de parrilla: chimichurri acompanha todos.'});
+  if(ids.has('costelinha')&&!ids.has('barbecue'))L.push({c:'alerta',t:'Costelinha sem barbecue: inclua o molho para pincelar nos últimos 15 min.'});
+  if(C.carnes.length&&!ids.has('sal'))L.push({c:'alerta',t:'Sal parrillero e sal grosso não estão na lista.'});
+  if(ids.has('tainha'))L.push({c:'dica',t:'Tainha inteira pede grelha-sanduíche. Veja o Arsenal.'});
+  const nomesE={'espeto-alto':'fileira de cima','espeto-baixo':'fileira de baixo',cesto:'cesto'};
+  for(const [e,n] of Object.entries(C.ev.pico)){if(n>CAP[e])L.push({c:'perigo',t:`Espetos: ${n} ao mesmo tempo na ${nomesE[e]}, que tem ${CAP[e]}. Escalone os horários ou passe algo para a parrilla.`})}
+  if(S.data===hojeISO()){
+    const agora=new Date(), m=agora.getHours()*60+agora.getMinutes();
+    if(C.ev.inicio<m&&toMin(S.hora)>m)L.push({c:'perigo',t:`O fogo precisaria ter começado às ${hhmm(C.ev.inicio)}. Atrase o horário de servir ou troque o corte mais longo.`});
+  }
+  const har=[];
+  if(tem(['costelao','asado_tira','shortrib','cupim','costela_cordeiro','paleta','carre','matambre']))har.push('Tannat uruguaio para gordura e fogo longo');
+  if(tem(['entrana','ojo','chorizo','picanha','vazio','maminha','tomahawk','denver','flatiron']))har.push('Malbec para os cortes de parrilla');
+  if(tem(['linguica','costelinha','panceta','morcilla']))har.push('Lager ou IPA para o porco');
+  if(tem(['salmao','camarao','polvo','tainha']))har.push('Sauvignon Blanc, Albariño ou rosé para o mar');
+  if(tem(['galeto','sobrecoxa','asa','coracao'])&&!har.length)har.push('Chardonnay ou cerveja de trigo para o frango');
+  if(har.length&&tem(['cerveja','tinto','branco']))L.push({c:'ok',t:'Harmonização: '+har.join('; ')+'.'});
+  else if(har.length)L.push({c:'dica',t:'Bebidas fora da conta. Sugestão: '+har.join('; ')+'.'});
+  if(!tem(['abacaxi','banana','doce_queijo']))L.push({c:'dica',t:'Sem doce: o abacaxi na rotativa com doce de leite fecha bem.'});
+  return L;
+}
+
+/* ===================== render ===================== */
+const V=document.getElementById('view');
+function render(){
+  document.querySelectorAll('.tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===tab));
+  document.getElementById('f-data').value=S.data;
+  const C=calc();
+  // o que está sendo digitado sobrevive à re-renderização (o modo assador re-renderiza a cada 15 s)
+  const guarda=['f-chef','f-conv-nome'].map(id=>{const el=document.getElementById(id);return el?{id,v:el.value,f:document.activeElement===el}:null}).filter(Boolean);
+  V.innerHTML=({montar:vMontar,compras:vCompras,fogo:vFogo,arsenal:vArsenal,historico:vHist})[tab](C);
+  guarda.forEach(g=>{const el=document.getElementById(g.id);if(el){el.value=g.v;if(g.f)el.focus()}});
+}
+
+function resumo(C){
+  const pk=Object.entries(C.ev.pico).reduce((s,[e,n])=>s+(e==='cesto'?0:n),0);
+  return `<section class="leitura" aria-label="Leitura do assador">
+   <div class="nums">
+    <div class="num"><b>${nf(C.kgCompra,1)}</b><span>kg de carne</span></div>
+    <div class="num"><b>${C.pessoas}</b><span>pessoas</span></div>
+    <div class="num"><b>${hhmm(C.ev.inicio)}</b><span>acender</span></div>
+    <div class="num"><b>${nf(C.custo,0)}</b><span>R$ estimado</span></div>
+   </div>
+   <ul>${leitura(C).map(l=>`<li class="${l.c}">${esc(l.t)}</li>`).join('')}</ul>
+  </section>`;
+}
+
+function vMontar(C){
+  const g=C.p, travado=S.conv.length>0;
+  const pass=(k,n,s)=>`<div class="passo"><div class="rot">${n}<small>${s}</small></div><div class="ctl">
+    <button data-act="menos" data-k="${k}" aria-label="Menos ${n}" ${travado?'disabled':''}>−</button><output>${g[k]}</output>
+    <button data-act="mais" data-k="${k}" aria-label="Mais ${n}" ${travado?'disabled':''}>+</button></div></div>`;
+  const TIPO={c:'Criança',a:'Adulto',k:'Comilão'};
+  const turma=(CFG.turma||[]).filter(t=>!S.conv.some(x=>x.n.toLowerCase()===t.n.toLowerCase()));
+  const lista=`<div class="conv">
+    <button class="conv-tit" data-act="lista" aria-expanded="${S.listaAberta}"><span><b>Lista de convidados</b> <span class="muted small">${S.conv.length?S.conv.length+' na lista · a contagem vem dela':'opcional: nomes, restrições e rateio'}</span></span><span aria-hidden="true">${S.listaAberta?'−':'+'}</span></button>
+    ${S.listaAberta?`<div class="conv-corpo">
+      <div class="conv-add"><input type="text" id="f-conv-nome" placeholder="Nome" aria-label="Nome do convidado" maxlength="40">
+        <select id="f-conv-tipo" aria-label="Tipo">${Object.entries(TIPO).map(([k,n])=>`<option value="${k}" ${k==='a'?'selected':''}>${n}</option>`).join('')}</select>
+        <button class="btn peq pri" data-act="conv-add">Pôr</button></div>
+      ${turma.length?`<div class="turma"><span class="small muted">Turma:</span>${turma.map(t=>`<button class="chip" data-act="conv-turma" data-n="${esc(t.n)}">${esc(t.n)}</button>`).join('')}</div>`:''}
+      ${S.conv.map((x,ix)=>`<div class="cv"><div class="cv-l1"><b>${esc(x.n)}</b>
+          <select data-conv="${ix}" data-campo="t" aria-label="Tipo de ${esc(x.n)}">${Object.entries(TIPO).map(([k,n])=>`<option value="${k}" ${x.t===k?'selected':''}>${n}</option>`).join('')}</select>
+          <label class="paga"><input type="checkbox" data-conv="${ix}" data-campo="paga" ${x.paga?'checked':''}> paga</label>
+          <button class="cv-x" data-act="conv-del" data-ix="${ix}" aria-label="Tirar ${esc(x.n)}">×</button></div>
+        <input type="text" class="cv-obs" data-conv="${ix}" data-campo="obs" value="${esc(x.obs||'')}" placeholder="Restrição ou observação (ex.: vegetariano)" aria-label="Observação de ${esc(x.n)}" maxlength="80"></div>`).join('')}
+      ${S.conv.length?'<button class="btn peq" data-act="conv-limpar">Esvaziar a lista</button>':''}
+    </div>`:''}</div>`;
+  let h=`<div class="gente">${pass('c','Crianças','200 g')}${pass('a','Adultos','400 g')}${pass('k','Comilões','600 g')}</div>
+  <div class="linha2">
+    <div class="campo"><label for="f-hora">Servir às</label><input type="time" id="f-hora" value="${S.hora}"></div>
+    <div class="campo"><label for="f-carvao">Carvão nos espetos</label><span class="sw"><input type="checkbox" id="f-carvao" ${S.carvao?'checked':''}><i></i></span></div>
+  </div>
+  ${lista}
+  <h2 class="sec">Começar de um clássico</h2>
+  <div class="presets">${PRESETS.map(p=>`<button class="chip ${S.preset===p.id?'on':''}" data-act="preset" data-id="${p.id}">${p.n}</button>`).join('')}
+   <button class="chip" data-act="limpar">Limpar tudo</button></div>
+  ${resumo(C)}
+  <h2 class="sec">O que vai para o fogo</h2>`;
+  for(const [cat,nome] of CATS){
+    const its=ITENS.filter(i=>i.cat===cat), n=its.filter(i=>S.sel.includes(i.id)).length;
+    h+=`<h3 class="cat">${nome}<span>${n?n+' escolhido'+(n>1?'s':''):''}</span></h3><div class="itens">`;
+    for(const i of its){
+      const on=S.sel.includes(i.id), ab=abertos.has(i.id);
+      let meta=i.cat==='bebida'?'':i.est==='cozinha'?(i.prepAt!=null?'Preparo na cozinha':''):`${EST[i.est].n} · ${i.dur>=60?Math.floor(i.dur/60)+' h'+(i.dur%60?' '+String(i.dur%60).padStart(2,'0'):''):i.dur+' min'}`;
+      if(on&&i.carne&&i._kg)meta+=` · ${nf(i._kg,1)} kg`;
+      h+=`<div class="item ${on?'on':''}"><div class="row">
+        <button class="tog" data-act="tog" data-id="${i.id}" aria-pressed="${on}"><span class="box"></span><span style="min-width:0"><div class="nome">${i.nome}${i.assin?'<span class="assin">da casa</span>':''}</div>${meta?`<div class="meta">${meta}</div>`:''}</span></button>
+        <button class="dicab" data-act="dica" data-id="${i.id}" aria-expanded="${ab}">Dica</button></div>
+        ${ab?`<div class="dica"><p>${i.dica}</p>${i.pedido?`<p class="ped">No açougue: ${i.pedido}</p>`:''}</div>`:''}</div>`;
+    }
+    h+='</div>';
+  }
+  return h;
+}
+
+const SECOES=['Açougue','Peixaria','Hortifruti','Frios e laticínios','Padaria','Mercearia','Bebidas','Fogo'];
+const assinatura=()=>S.data+'|'+S.sel.slice().sort().join(',');
+function vCompras(C){
+  const tk=ticks[assinatura()]||{};
+  const feitos=C.linhas.filter(l=>tk[l.key]).length;
+  let h=`<h2 class="sec">Lista do mercado</h2>
+  <div class="totais"><div class="tot dest"><b>${brl(C.custo)}</b><span>Total estimado</span></div>
+   <div class="tot"><b>${C.pessoas?brl(C.custo/C.pessoas):'–'}</b><span>Por pessoa</span></div>
+   <div class="tot"><b>${feitos}/${C.linhas.length}</b><span>No carrinho</span></div></div>
+  <div class="acoes"><button class="btn pri" data-act="copiar">Copiar lista</button>
+   <a class="btn" href="https://wa.me/?text=${encodeURIComponent(textoLista(C))}" target="_blank" rel="noopener">Mandar no WhatsApp</a>
+   ${feitos?'<button class="btn" data-act="desmarcar">Desmarcar tudo</button>':''}</div>`;
+  if(!C.linhas.length)return h+'<p class="vazio" style="margin-top:16px">Escolha o cardápio na aba Montar e a lista aparece aqui, separada por seção do mercado.</p>';
+  for(const s of SECOES){
+    const ls=C.linhas.filter(l=>l.secao===s); if(!ls.length)continue;
+    const sub=ls.reduce((x,l)=>x+l.total,0);
+    h+=`<div class="secao"><h3 class="cat">${s}<span>${brl(sub)}</span></h3>`;
+    for(const l of ls){
+      const ed=editPreco===l.key;
+      h+=`<div class="lc ${tk[l.key]?'feito':''}"><button class="box" data-act="tick" data-k="${l.key}" aria-label="Marcar ${esc(l.nome)}" aria-pressed="${!!tk[l.key]}"></button>
+       <div class="lcb"><div class="lcn">${esc(l.nome)}</div><div class="lcq">${qtd(l.q,l.un)}${l.nota?` <span class="muted">${l.nota}</span>`:''}</div>${l.ped?`<div class="lcp">${l.ped}</div>`:''}</div>
+       <div class="preco">${brl(l.total)}<br>${ed?`<input type="number" inputmode="decimal" step="0.5" min="0" id="f-preco" value="${l.pu}" aria-label="Preço por ${l.un}">`:`<button data-act="preco" data-k="${l.key}">${brl(l.pu)}/${l.un}</button>`}</div></div>`;
+    }
+    h+='</div>';
+  }
+  const R=rateio(C);
+  h+=`<h2 class="sec">Rateio</h2><div class="rateio">
+   <div class="totais"><div class="tot dest"><b>${R.pag?brl(R.cada):'–'}</b><span>Por pagante</span></div><div class="tot"><b>${R.pag}</b><span>${S.conv.length?'Pagantes na lista':'Adultos e comilões'}</span></div></div>
+   <div class="linha2"><div class="campo"><label for="f-gasto">Gasto real, R$</label><input type="number" inputmode="decimal" min="0" step="1" id="f-gasto" value="${S.gasto??''}" placeholder="${nf(C.custo,0)}"></div>
+    <div class="campo"><label for="f-pix">Chave Pix</label><input type="text" id="f-pix" value="${esc(CFG.pix||'')}" placeholder="celular ou e-mail"></div></div>
+   <p class="small muted" style="margin:8px 0 0">${S.gasto?'Usando o gasto real.':'Usando a estimativa; ponha o gasto real depois do mercado.'} ${S.conv.length?'Quem paga sai da lista de convidados.':'Monte a lista de convidados em Montar para escolher quem paga.'}</p>
+   <div class="acoes"><button class="btn pri" data-act="cobrar">Copiar cobrança</button><a class="btn" href="https://wa.me/?text=${encodeURIComponent(R.texto)}" target="_blank" rel="noopener">Cobrar no WhatsApp</a></div></div>`;
+  return h+`<p class="nota">Preços são estimativas de referência. Toque no preço unitário para corrigir com o valor do seu mercado; o app guarda. Lenha não entra: você usa a de casa.</p>`;
+}
+function rateio(C){
+  const total=S.gasto>0?S.gasto:C.custo;
+  const pagantes=S.conv.length?S.conv.filter(x=>x.paga):null;
+  const pag=pagantes?pagantes.length:C.p.a+C.p.k;
+  const cada=pag?Math.ceil(total/pag*100)/100:0;
+  let t=`*Churrasco ${S.data.split('-').reverse().slice(0,2).join('/')}* 🔥\nTotal ${brl(total)} ÷ ${pag} = *R$ ${nf(cada,2)} por pessoa*`;
+  if(pagantes&&pagantes.length)t+='\n'+pagantes.map(x=>'• '+x.n).join('\n');
+  if(CFG.pix)t+=`\n\nPix: ${CFG.pix}`;
+  return {total,pag,cada,texto:t};
+}
+function textoLista(C){
+  let t=`*Tchê Parrilla · ${S.data.split('-').reverse().join('/')}* (${C.pessoas} pessoas)\n`;
+  for(const s of SECOES){const ls=C.linhas.filter(l=>l.secao===s);if(!ls.length)continue;t+=`\n*${s}*\n`;ls.forEach(l=>t+=`☐ ${l.nome}: ${qtd(l.q,l.un)}${l.nota?' ('+l.nota+')':''}\n`)}
+  return t+`\nEstimativa: ${brl(C.custo)}`;
+}
+
+function vFogo(C){
+  const cont={};PINS.forEach(p=>cont[p.id]=[]);
+  for(const i of C.sel){if(!i.est||i.cat==='bebida'||i.est==='cozinha')continue;const pin=EST[i.est].pin;if(pin)cont[pin].push(i)}
+  if(C.ev.inicio!==toMin(S.hora))cont.braseiro=[{nome:'Lenha da casa',est:'braseiro'}];
+  const ps=PINS.find(p=>p.id===pinSel);
+  let h=vChef()+`<h2 class="sec">Mapa da churrasqueira</h2>
+  <div class="mapa"><img src="img/churrasqueira.jpg" alt="Foto da churrasqueira: braseiro à esquerda, parrilla com grelha de cima ao centro, espetos rotativos à direita" width="1400" height="788">
+   ${PINS.map(p=>{const n=cont[p.id].length;return `<button class="pin ${n?'ativo':''} ${pinSel===p.id?'sel':''}" style="left:${p.x}%;top:${p.y}%" data-act="pin" data-id="${p.id}" aria-label="${p.n}: ${n} itens">${p.id==='braseiro'?'<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M12 2.5c3 4 6.5 6 6.5 11a6.5 6.5 0 0 1-13 0c0-3 1.4-4.8 3-6.6.2 2 1 3.4 2.4 4.2-.7-3.6.3-6.2 1.1-8.6z"/></svg>':n}</button>`}).join('')}
+  </div>
+  <div class="legenda">${PINS.map(p=>`<button class="${pinSel===p.id?'sel':''}" data-act="pin" data-id="${p.id}">${p.n}</button>`).join('')}</div>`;
+  if(ps){
+    const its=cont[ps.id];
+    h+=`<div class="pinfo"><h4>${ps.n}</h4><div class="small muted">${ps.t}</div>${its.length&&ps.id!=='braseiro'?`<ul>${its.map(i=>`<li>${i.nome}${C.espN[i.id]>1?` · ${C.espN[i.id]} espetos`:''} <span class="muted small">${EST[i.est]?.n||''}</span></li>`).join('')}</ul>`:ps.id==='braseiro'?'':'<p class="small muted" style="margin:8px 0 0">Nada aqui no cardápio de hoje.</p>'}</div>`;
+  }
+  const hoje=S.data===hojeISO(), agora=hoje?new Date().getHours()*60+new Date().getMinutes():null;
+  h+=`<h2 class="sec">Cronograma</h2>
+  <div class="modo"><div><b>Modo assador</b><p>${modo?'Ligado: tela acesa e bipe em cada etapa. Só funciona com o app aberto.':'Mantém a tela acesa e bipa em cada etapa enquanto o app estiver aberto.'}</p></div>
+   <button class="btn ${modo?'':'pri'} peq" data-act="modo">${modo?'Desligar':'Ligar'}</button></div><ol class="crono">`;
+  let marcou=false;
+  for(const e of C.ev){
+    if(hoje&&!marcou&&!e.vespera&&e.t>agora){h+=`<li class="agora-linha">agora ${hhmm(agora)}</li>`;marcou=true}
+    const cls=[e.k,hoje&&!e.vespera&&e.t<=agora?'passou':''].join(' ');
+    h+=`<li class="ev ${cls}"><time>${e.vespera?'véspera':hhmm(e.t)}</time><span class="dot"></span><div class="tx">${esc(e.tx)}${e.sub?`<small>${esc(e.sub)}</small>`:''}</div></li>`;
+  }
+  return h+'</ol>';
+}
+
+const SUGEST=['Choveu e a lenha está úmida. Como faço a brasa render?','Atrasou 1 hora. Como reorganizo o cronograma?','Sobrou carne. O que faço com ela amanhã?','A capa da picanha está queimando por fora e crua por dentro.'];
+function md(t){return esc(t).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/^#+\s*(.+)$/gm,'<b>$1</b>').replace(/^[-•]\s+/gm,'• ').replace(/\n/g,'<br>')}
+function vChef(){
+  if(!sessao)return '';
+  const ult=chat.length-1;
+  return `<h2 class="sec">Pergunte ao chef</h2><div class="chef">
+   ${chat.length?`<div class="conversa">${chat.map((m,ix)=>m.role==='user'?`<div class="msg eu">${esc(m.content)}</div>`:`<div class="msg chefm" ${ix===ult?'id="chef-ultima"':''}>${m.content?md(m.content):'<span class="muted">Pensando…</span>'}</div>`).join('')}</div>`
+    :`<div class="sugest">${SUGEST.map(s=>`<button class="chip" data-act="chef-sug" data-q="${esc(s)}">${esc(s)}</button>`).join('')}</div>`}
+   ${chefErro?`<p class="small" style="color:var(--perigo);margin:0">${esc(chefErro)}</p>`:''}
+   <div class="chef-in"><textarea id="f-chef" rows="2" placeholder="Pergunte sobre o fogo, um corte, um imprevisto…" aria-label="Pergunta ao chef" maxlength="600"></textarea>
+    ${chefPensando?'<button class="btn" data-act="chef-parar">Parar</button>':'<button class="btn pri" data-act="chef-ir">Perguntar</button>'}</div>
+   ${chat.length&&!chefPensando?'<button class="btn peq" data-act="chef-nova" style="justify-self:start">Nova conversa</button>':''}
+   <p class="small muted" style="margin:0">O chef conhece seu equipamento e o cardápio de hoje. Cada pergunta é cobrada na API do Claude.</p></div>`;
+}
+function contextoChef(){
+  const C=calc();
+  const itens=C.sel.filter(i=>i.cat!=='bebida').map(i=>`- ${i.nome}${i.carne&&i._kg?` (${nf(i._kg,1)} kg)`:''}${i.est&&i.est!=='cozinha'?`, ${EST[i.est].n}, ${i.dur} min`:''}`).join('\n')||'- nada escolhido ainda';
+  const crono=C.ev.filter(e=>!e.vespera).map(e=>`${hhmm(e.t)} ${e.tx}${e.sub?' ('+e.sub+')':''}`).join('\n');
+  const n=new Date();
+  return `Você é o chef parrillero do app Tchê Parrilla, ajudando o Renan durante um churrasco.
+Tom: chef sério, direto e técnico, sem regionalismo. Português do Brasil. Dê temperaturas internas e tempos quando couber. No máximo 130 palavras, sem introdução.
+
+Equipamento real dele:
+- Braseiro Grader D1 a lenha à esquerda (a brasa cai e é puxada para baixo da parrilla).
+- Parrilla com elevação por manivela, e uma grelha de cima para calor indireto.
+- À direita, espetos rotativos motorizados Kafer em duas fileiras: a de cima tem 4 posições (mais longe da brasa); a de baixo tem 3 posições mais um cesto rotativo para legumes. O fosso dos espetos é mais fundo e aceita carvão.
+- Frigideira furada para legumes e panelinha de ferro fundido (provoleta).
+- Usa lenha de casa; carvão é opcional no fosso dos espetos.
+
+Churrasco de ${S.data.split('-').reverse().join('/')}, servir às ${S.hora}. Agora são ${hhmm(n.getHours()*60+n.getMinutes())}.
+Pessoas: ${C.p.a} adultos, ${C.p.k} comilões, ${C.p.c} crianças.
+Cardápio:
+${itens}
+Cronograma do app:
+${crono}`;
+}
+async function perguntarChef(q){
+  q=(q||'').trim();if(!q||!sessao||chefPensando)return;
+  chefErro='';chat.push({role:'user',content:q},{role:'assistant',content:''});chat=chat.slice(-8);
+  chefPensando=true;render();
+  chefCtl=new AbortController();
+  const alvo=chat[chat.length-1];
+  try{
+    const r=await fetch(SUPA_URL+'/functions/v1/chef',{method:'POST',signal:chefCtl.signal,
+      headers:{'Content-Type':'application/json',Authorization:'Bearer '+sessao.access_token,apikey:SUPA_ANON},
+      body:JSON.stringify({contexto:contextoChef(),mensagens:chat.slice(0,-1)})});
+    if(!r.ok){let m='O chef não respondeu agora. Tente de novo.';try{m=(await r.json()).erro||m}catch(e){}throw new Error(m)}
+    const rd=r.body.getReader(), dec=new TextDecoder(); let txt='';
+    for(;;){const {value,done}=await rd.read();if(done)break;txt+=dec.decode(value,{stream:true});alvo.content=txt;const el=document.getElementById('chef-ultima');if(el)el.innerHTML=md(txt)}
+    alvo.content=txt;
+  }catch(e){
+    if(e&&e.name!=='AbortError')chefErro=e.message||'O chef não respondeu agora. Tente de novo.';
+    if(!alvo.content)chat.splice(-2,2);
+  }
+  chefPensando=false;chefCtl=null;render();
+}
+function vArsenal(C){
+  const ids=new Set(S.sel), sel=C.sel;
+  const usa=a=>a.usa.some(u=>u==='*todos'?sel.length>0:u==='*carne'?sel.some(i=>i.carne):u==='*parrilla'?sel.some(i=>['parrilla','frigideira','ferro'].includes(i.est)):u==='*esp'?sel.some(i=>ehEsp(i.est)):u==='*ferro'?sel.some(i=>i.est==='ferro'):ids.has(u));
+  const lista=ARSENAL.map(a=>({...a,hoje:usa(a)})).sort((x,y)=>y.hoje-x.hoje);
+  const st=id=>CFG.arsenal[id]||'';
+  return `<h2 class="sec">Arsenal do assador</h2><p class="small muted" style="margin-top:-4px">Ferramentas que fazem diferença no seu equipamento. As marcadas "hoje" servem ao cardápio atual.</p>
+  <div class="ars">${lista.map(a=>`<div class="arm ${a.hoje?'hoje':''}"><div class="t"><b>${a.n}</b>${a.hoje?'<span class="tag">hoje</span>':''}<p>${a.t}</p></div>
+   <div class="seg" role="group" aria-label="Situação de ${esc(a.n)}"><button class="${st(a.id)==='tenho'?'on tenho':''}" data-act="ars" data-id="${a.id}" data-v="tenho">Tenho</button><button class="${st(a.id)==='quero'?'on quero':''}" data-act="ars" data-id="${a.id}" data-v="quero">Quero</button></div></div>`).join('')}</div>`;
+}
+
+function vHist(C){
+  const lista=HIST.filter(x=>histFiltro==='todos'||x.fav);
+  const pre=PRESETS.find(p=>p.id===S.preset);
+  const tit=novo.titulo||(pre?pre.n:'Churrasco')+' · '+S.data.split('-').reverse().slice(0,2).join('/');
+  let h=`<h2 class="sec">Guardar o churrasco</h2>
+  <div class="salvar"><input type="text" id="f-titulo" placeholder="Nome" value="${esc(tit)}" aria-label="Nome do churrasco">
+   <div class="estrelas" role="group" aria-label="Nota">${[1,2,3,4,5].map(n=>`<button class="${novo.nota>=n?'on':''}" data-act="nota" data-n="${n}" aria-label="Nota ${n}">★</button>`).join('')}</div>
+   <textarea id="f-obs" placeholder="O que acertou, o que mudar da próxima vez" aria-label="Observações">${esc(novo.obs)}</textarea>
+   ${['carne','bebida'].map(c=>{const k=c==='carne'?'fbCarne':'fbBeb';return `<div class="fb"><span class="small muted">${c==='carne'?'Carne':'Bebida'}</span><div class="seg" role="group" aria-label="Como foi a ${c}">${Object.entries(FB).map(([v,o])=>`<button class="${novo[k]===v?'on':''}" data-act="fb-novo" data-k="${k}" data-v="${v}">${o.n}</button>`).join('')}</div></div>`}).join('')}
+   <p class="small muted" style="margin:0">Com o que sobrou ou faltou, o app ajusta a quantidade dos próximos churrascos.</p>
+   <div><button class="btn pri" data-act="salvar">Guardar no histórico</button> <span class="small muted">${C.pessoas} pessoas · ${C.sel.length} itens · ${brl(C.custo)}</span></div></div>
+  <h2 class="sec">Histórico</h2><p class="small muted" style="margin-top:-6px">${sessao?esc(sessao.user.email)+' · ':''}<button class="sair" data-act="sair">Sair</button></p>
+  <div class="filtro"><button class="chip ${histFiltro==='todos'?'on':''}" data-act="filtro" data-v="todos">Todos</button><button class="chip ${histFiltro==='fav'?'on':''}" data-act="filtro" data-v="fav">Favoritos</button></div>
+  <div class="hist">`;
+  if(!lista.length)h+=`<div class="vazio">${HIST.length?'Nenhum favorito ainda. Toque na estrela de um churrasco para marcar.':'Nenhum churrasco guardado. Depois do próximo, dê a nota e guarde aqui para repetir com um toque.'}</div>`;
+  for(const x of lista){
+    const nomes=(x.sel||[]).map(id=>POR_ID[id]).filter(i=>i&&i.cat!=='bebida'&&i.cat!=='molho').map(i=>i.nome);
+    h+=`<div class="hc"><div class="hh"><div><b>${esc(x.titulo)}</b><div class="hm">${(x.data||'').split('-').reverse().join('/')} · ${x.pessoas?x.pessoas.c+x.pessoas.a+x.pessoas.k:0} pessoas · ${'★'.repeat(x.nota||0)||'sem nota'}${x.custo?' · '+brl(x.custo):''}</div></div>
+     <button class="fav ${x.fav?'on':''}" data-act="fav" data-id="${x.id}" aria-label="Favorito" aria-pressed="${!!x.fav}">★</button></div>
+     <div class="hi">${esc(nomes.join(', '))}</div>${x.obs?`<div class="ho">${esc(x.obs)}</div>`:''}
+     ${(x.conv||[]).length?`<div class="hm">${x.conv.map(c=>esc(c.n)).join(', ')}</div>`:''}
+     <div class="fbs">${['carne','bebida'].map(c=>`<label class="small muted">${c==='carne'?'Carne':'Bebida'} <select data-fb="${x.id}" data-campo="${c}" aria-label="Como foi a ${c}"><option value="">como foi?</option>${Object.entries(FB).map(([v,o])=>`<option value="${v}" ${x.fb&&x.fb[c]===v?'selected':''}>${o.n}</option>`).join('')}</select></label>`).join('')}</div>
+     ${(x.fotos||[]).length?`<div class="fotos">${x.fotos.map(f=>`<button class="foto" data-act="foto" data-f="${esc(f)}" aria-label="Ver foto"><img src="${fotoURL[f]||''}" alt="Foto do churrasco" loading="lazy"></button>`).join('')}</div>`:''}
+     <div class="acoes"><button class="btn peq pri" data-act="repetir" data-id="${x.id}">Repetir</button>
+      ${sessao?(enviandoFoto===x.id?'<span class="btn peq">Enviando foto…</span>':`<label class="btn peq">Pôr foto<input type="file" accept="image/*" data-foto="${x.id}" hidden></label>`):''}
+      ${apagar===x.id?`<button class="btn peq" data-act="apagar-ok" data-id="${x.id}" style="color:var(--perigo)">Confirmar exclusão</button><button class="btn peq" data-act="apagar-nao">Cancelar</button>`:`<button class="btn peq" data-act="apagar" data-id="${x.id}">Apagar</button>`}</div></div>`;
+  }
+  if(fotoAberta)h+=`<div class="lightbox" data-act="foto-fechar" role="dialog" aria-label="Foto"><img src="${fotoURL[fotoAberta]||''}" alt="Foto do churrasco"><button class="btn" data-act="foto-fechar">Fechar</button></div>`;
+  return h+'</div>';
+}
+
+/* ===================== persistência (Supabase) ===================== */
+const SUPA_URL='https://hgdrpinvvwolooxvzqnn.supabase.co', SUPA_ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhnZHJwaW52dndvbG9veHZ6cW5uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI2NDQxNjgsImV4cCI6MjEwODIyMDE2OH0.ljjAQRzjCk6AUN1UeGWJ-MiTn-1bl6tBCo0qFgl-DeE';
+const falhou=m=>toast(m);
+async function salvarCfg(){
+  const {error}=await sb.from('config').upsert({id:1,dados:CFG,atualizado_em:new Date().toISOString()});
+  if(error)falhou('Não consegui salvar. Tente de novo.');
+}
+async function carregar(){
+  const [c,h]=await Promise.all([sb.from('config').select('dados').eq('id',1).maybeSingle(),sb.from('churrascos').select('id,dados,criado_em').order('criado_em',{ascending:false})]);
+  if(c.error||h.error){falhou('Não consegui ler os dados. Feche e abra de novo.');return}
+  CFG=Object.assign(CFG0(),(c.data&&c.data.dados)||{});
+  HIST=(h.data||[]).map(r=>({...r.dados,id:r.id}));
+  await assinarFotos();render();
+}
+async function assinarFotos(){
+  const faltam=[...new Set(HIST.flatMap(x=>x.fotos||[]))].filter(p=>!fotoURL[p]);
+  if(!faltam.length)return;
+  const {data}=await sb.storage.from('fotos').createSignedUrls(faltam,60*60*12);
+  (data||[]).forEach(d=>{if(d.signedUrl)fotoURL[d.path]=d.signedUrl});
+}
+const semId=x=>{const {id,...r}=x;return r};
+async function addHist(x){
+  const {data,error}=await sb.from('churrascos').insert({dados:x}).select('id').single();
+  if(error){falhou('Não consegui guardar. Tente de novo.');return false}
+  HIST.unshift({...x,id:data.id});render();return true;
+}
+async function updHist(id,patch){
+  const x=HIST.find(h=>h.id===id);if(!x)return;
+  const {error}=await sb.from('churrascos').update({dados:semId({...x,...patch})}).eq('id',id);
+  if(error){falhou('Não consegui atualizar.');return}
+  Object.assign(x,patch);await assinarFotos();render();
+}
+async function delHist(id){
+  const x=HIST.find(h=>h.id===id);
+  const {error}=await sb.from('churrascos').delete().eq('id',id);
+  if(error){falhou('Não consegui apagar.');return}
+  if(x&&x.fotos&&x.fotos.length)sb.storage.from('fotos').remove(x.fotos);
+  HIST=HIST.filter(h=>h.id!==id);render();
+}
+function telaEntrar(msg){
+  const el=document.getElementById('entrar');
+  el.innerHTML=`<div class="cx"><img src="apple-touch-icon.png" alt=""><h1>TCHÊ <b>PARRILLA</b></h1><p>${msg||'Planejador do assador da casa.'}</p>
+   <button class="btn pri" id="b-google">Entrar com Google</button>
+   <p class="small">ou receba um link de acesso no e-mail</p>
+   <input type="email" id="f-email" placeholder="seu e-mail" autocomplete="email" aria-label="E-mail">
+   <button class="btn" id="b-link">Mandar link</button></div>`;
+  el.hidden=false;document.getElementById('app').hidden=true;document.getElementById('tabs').hidden=true;
+  const volta=location.origin+location.pathname;
+  document.getElementById('b-google').onclick=()=>sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:volta}});
+  document.getElementById('b-link').onclick=async()=>{const e=document.getElementById('f-email').value.trim();if(!e)return;
+    const {error}=await sb.auth.signInWithOtp({email:e,options:{emailRedirectTo:volta}});toast(error?'Não consegui mandar o link.':'Link enviado. Abra o e-mail neste aparelho.')};
+}
+async function entrou(s){
+  sessao=s;
+  const {data:ok}=await sb.rpc('autorizado');
+  if(!ok){telaEntrar(`A conta ${esc(s.user.email)} não tem acesso. <button class="sair" id="b-sair">Sair</button>`);document.getElementById('b-sair').onclick=()=>sb.auth.signOut();return}
+  document.getElementById('entrar').hidden=true;document.getElementById('app').hidden=false;document.getElementById('tabs').hidden=false;
+  render();carregar();
+}
+sb=window.supabase.createClient(SUPA_URL,SUPA_ANON,{auth:{persistSession:true,detectSessionInUrl:true,flowType:'pkce'}});
+sb.auth.onAuthStateChange((ev,s)=>{
+  if(!s){sessao=null;telaEntrar();return}
+  if(ev==='TOKEN_REFRESHED'){sessao=s;return}
+  if(!sessao||sessao.user.id!==s.user.id)setTimeout(()=>entrou(s),0);
+});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&sessao)carregar()});
+
+/* ===================== modo assador ===================== */
+let modo=false, wake=null, actx=null, timer=null; const avisados=new Set();
+function bipe(){if(!actx)return;try{const t=actx.currentTime;[0,.32].forEach(d=>{const o=actx.createOscillator(),g=actx.createGain();o.frequency.value=880;o.connect(g);g.connect(actx.destination);g.gain.setValueAtTime(.0001,t+d);g.gain.exponentialRampToValueAtTime(.4,t+d+.02);g.gain.exponentialRampToValueAtTime(.0001,t+d+.25);o.start(t+d);o.stop(t+d+.26)})}catch(e){}}
+function tick(){
+  if(S.data!==hojeISO())return;
+  const n=new Date(), m=n.getHours()*60+n.getMinutes();
+  for(const e of calc().ev){if(e.vespera)continue;const key=e.t+e.tx;if(e.t<=m&&e.t>m-2&&!avisados.has(key)){avisados.add(key);bipe();toast(hhmm(e.t)+' · '+e.tx)}}
+  if(tab==='fogo')render();
+}
+async function alternarModo(){
+  modo=!modo;
+  if(modo){try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();actx.resume&&actx.resume()}catch(e){}
+    try{wake=await navigator.wakeLock?.request('screen')}catch(e){wake=null}
+    bipe();tick();timer=setInterval(tick,15000);toast(S.data===hojeISO()?'Modo assador ligado':'Modo assador ligado; os bipes valem só no dia do churrasco')}
+  else{clearInterval(timer);try{wake&&wake.release()}catch(e){}wake=null}
+  render();
+}
+
+/* ===================== eventos ===================== */
+let tt=null;
+function toast(t){const el=document.getElementById('toast');el.textContent=t;el.hidden=false;clearTimeout(tt);tt=setTimeout(()=>el.hidden=true,3200)}
+document.querySelector('.tabs').addEventListener('click',e=>{const b=e.target.closest('[data-tab]');if(!b)return;tab=b.dataset.tab;editPreco=null;render();window.scrollTo({top:0})});
+document.getElementById('f-data').addEventListener('change',e=>{S.data=e.target.value||hojeISO();salvarRascunho();render()});
+V.addEventListener('change',e=>{
+  const t=e.target;
+  if(t.id==='f-hora'){S.hora=t.value||'13:00';salvarRascunho();render()}
+  if(t.id==='f-carvao'){S.carvao=t.checked;salvarRascunho();render()}
+  if(t.id==='f-gasto'){const v=parseFloat(String(t.value).replace(',','.'));S.gasto=v>0?v:null;salvarRascunho();render()}
+  if(t.id==='f-pix'){CFG.pix=t.value.trim().slice(0,80);salvarCfg();render()}
+  if(t.dataset.conv!=null){const x=S.conv[+t.dataset.conv];if(x){const c=t.dataset.campo;x[c]=c==='paga'?t.checked:c==='obs'?t.value.slice(0,80):t.value;
+    if(c==='t'){const m=(CFG.turma||[]).find(y=>y.n.toLowerCase()===x.n.toLowerCase());if(m&&m.t!==x.t){m.t=x.t;salvarCfg()}}salvarRascunho();render()}}
+  if(t.dataset.fb){const x=HIST.find(h=>h.id===t.dataset.fb);if(x)updHist(x.id,{fb:{...(x.fb||{}),[t.dataset.campo]:t.value}})}
+  if(t.dataset.foto){enviarFoto(t.dataset.foto,t.files&&t.files[0])}
+  if(t.id==='f-preco'&&editPreco){const v=parseFloat(String(t.value).replace(',','.'));if(!isNaN(v)&&v>=0){CFG.precos[editPreco]=v;salvarCfg()}editPreco=null;render()}
+});
+V.addEventListener('input',e=>{if(e.target.id==='f-titulo')novo.titulo=e.target.value;if(e.target.id==='f-obs')novo.obs=e.target.value});
+V.addEventListener('keydown',e=>{
+  if(e.target.id==='f-preco'&&e.key==='Enter')e.target.blur();
+  if(e.target.id==='f-conv-nome'&&e.key==='Enter'){e.preventDefault();addConv()}
+  if(e.target.id==='f-chef'&&e.key==='Enter'&&!e.shiftKey){e.preventDefault();const el=e.target;const q=el.value;el.value='';perguntarChef(q)}
+});
+function addConv(nome,tipo){
+  const el=document.getElementById('f-conv-nome');nome=(nome??(el?el.value:'')).trim().slice(0,40);if(!nome)return;
+  if(S.conv.some(x=>x.n.toLowerCase()===nome.toLowerCase())){toast(nome+' já está na lista');return}
+  const m=(CFG.turma||[]).find(y=>y.n.toLowerCase()===nome.toLowerCase());
+  const t=tipo||(m?m.t:(document.getElementById('f-conv-tipo')||{}).value||'a');
+  S.conv.push({n:m?m.n:nome,t,paga:t!=='c',obs:m&&m.obs?m.obs:''});
+  if(!m){CFG.turma=[...(CFG.turma||[]),{n:nome,t}].slice(-60);salvarCfg()}
+  if(el)el.value='';salvarRascunho();render();const n=document.getElementById('f-conv-nome');if(n&&!tipo)n.focus();
+}
+async function enviarFoto(id,file){
+  if(!file||!sessao)return;
+  enviandoFoto=id;render();
+  try{
+    let blob=file;
+    try{const bmp=await createImageBitmap(file);const k=Math.min(1,1600/Math.max(bmp.width,bmp.height));const cv=document.createElement('canvas');cv.width=Math.round(bmp.width*k);cv.height=Math.round(bmp.height*k);cv.getContext('2d').drawImage(bmp,0,0,cv.width,cv.height);blob=await new Promise(r=>cv.toBlob(r,'image/jpeg',.82))||file}catch(e){}
+    const path=`${id}/${Date.now()}.jpg`;
+    const {error}=await sb.storage.from('fotos').upload(path,blob,{contentType:'image/jpeg'});
+    if(error)throw error;
+    const x=HIST.find(h=>h.id===id);await updHist(id,{fotos:[...((x&&x.fotos)||[]),path].slice(-12)});toast('Foto guardada');
+  }catch(e){toast('Não consegui enviar a foto. Tente uma menor.')}
+  enviandoFoto=null;render();
+}
+V.addEventListener('focusout',e=>{if(e.target.id==='f-preco')e.target.dispatchEvent(new Event('change',{bubbles:true}))});
+V.addEventListener('click',async e=>{
+  const b=e.target.closest('[data-act]');if(!b)return;const a=b.dataset.act,id=b.dataset.id;
+  if(a==='mais'||a==='menos'){S[b.dataset.k]=Math.max(0,Math.min(60,S[b.dataset.k]+(a==='mais'?1:-1)))}
+  else if(a==='tog'){S.sel=S.sel.includes(id)?S.sel.filter(x=>x!==id):[...S.sel,id];S.preset=null}
+  else if(a==='dica'){abertos.has(id)?abertos.delete(id):abertos.add(id)}
+  else if(a==='preset'){const p=PRESETS.find(x=>x.id===id);S.sel=p.sel.slice();S.preset=id;toast(p.n+' carregado')}
+  else if(a==='limpar'){S.sel=[];S.preset=null}
+  else if(a==='tick'){const s=assinatura();ticks[s]=ticks[s]||{};ticks[s][b.dataset.k]=!ticks[s][b.dataset.k];const ks=Object.keys(ticks);if(ks.length>20)delete ticks[ks[0]];LS.set('tp-ticks',ticks)}
+  else if(a==='desmarcar'){delete ticks[assinatura()];LS.set('tp-ticks',ticks)}
+  else if(a==='preco'){editPreco=b.dataset.k;render();const i=document.getElementById('f-preco');if(i){i.focus();i.select()}return}
+  else if(a==='copiar'){const txt=textoLista(calc());try{await navigator.clipboard.writeText(txt);toast('Lista copiada')}catch(err){toast('Não deu para copiar aqui. Use o botão do WhatsApp.')}return}
+  else if(a==='pin'){pinSel=pinSel===id?null:id}
+  else if(a==='modo'){alternarModo();return}
+  else if(a==='ars'){CFG.arsenal[id]=CFG.arsenal[id]===b.dataset.v?'':b.dataset.v;salvarCfg()}
+  else if(a==='sair'){await sb.auth.signOut();return}
+  else if(a==='lista'){S.listaAberta=!S.listaAberta}
+  else if(a==='conv-add'){addConv();return}
+  else if(a==='conv-turma'){addConv(b.dataset.n);return}
+  else if(a==='conv-del'){S.conv.splice(+b.dataset.ix,1)}
+  else if(a==='conv-limpar'){const g=gente();Object.assign(S,g);S.conv=[]}
+  else if(a==='cobrar'){const t=rateio(calc()).texto;try{await navigator.clipboard.writeText(t);toast('Cobrança copiada')}catch(err){toast('Não deu para copiar aqui. Use o botão do WhatsApp.')}return}
+  else if(a==='chef-sug'){perguntarChef(b.dataset.q);return}
+  else if(a==='chef-ir'){const el=document.getElementById('f-chef');const q=el?el.value:'';if(el)el.value='';perguntarChef(q);return}
+  else if(a==='chef-parar'){chefCtl&&chefCtl.abort();return}
+  else if(a==='chef-nova'){chat=[];chefErro=''}
+  else if(a==='fb-novo'){novo[b.dataset.k]=novo[b.dataset.k]===b.dataset.v?'':b.dataset.v}
+  else if(a==='foto'){fotoAberta=b.dataset.f}
+  else if(a==='foto-fechar'){fotoAberta=null}
+  else if(a==='nota'){novo.nota=+b.dataset.n}
+  else if(a==='salvar'){const C=calc();const pre=PRESETS.find(p=>p.id===S.preset);
+    const x={titulo:(novo.titulo||(pre?pre.n:'Churrasco')+' · '+S.data.split('-').reverse().slice(0,2).join('/')).slice(0,80),data:S.data,hora:S.hora,pessoas:gente(),conv:S.conv.map(c=>({...c})),sel:S.sel.slice(),carvao:S.carvao,nota:novo.nota,obs:novo.obs.slice(0,600),fav:false,custo:Math.round(S.gasto>0?S.gasto:C.custo),
+      fb:{carne:novo.fbCarne,bebida:novo.fbBeb},fotos:[],criadoEm:new Date().toISOString()};
+    if(await addHist(x)){novo=NOVO0();toast('Guardado no histórico')}}
+  else if(a==='filtro'){histFiltro=b.dataset.v}
+  else if(a==='fav'){const x=HIST.find(h=>h.id===id);if(x){updHist(id,{fav:!x.fav});if(db)return}}
+  else if(a==='repetir'){const x=HIST.find(h=>h.id===id);if(x){S.sel=(x.sel||[]).filter(i=>POR_ID[i]);Object.assign(S,x.pessoas||{});S.conv=(x.conv||[]).map(c=>({...c}));S.gasto=null;S.hora=x.hora||S.hora;S.carvao=!!x.carvao;S.preset=null;S.data=hojeISO();tab='montar';toast('Cardápio carregado: '+x.titulo);window.scrollTo({top:0})}}
+  else if(a==='apagar'){apagar=id}
+  else if(a==='apagar-nao'){apagar=null}
+  else if(a==='apagar-ok'){apagar=null;await delHist(id);toast('Apagado')}
+  salvarRascunho();render();
+});
+</script>
+</body>
+</html>
